@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="el"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#102b35"><title>THERMOAROU PRO</title><style>
+:root{--navy:#102b35;--teal:#167d78;--mint:#dff3ee;--bg:#f4f7f7;--ink:#182d33;--muted:#6b7c80;--line:#e1e9e9;--white:#fff;--orange:#f4a340;--red:#bd4a4a;--shadow:0 8px 24px #102b350c}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}.app{max-width:1100px;margin:auto;min-height:100vh;padding-bottom:88px}.top{background:var(--navy);color:white;padding:22px 20px 20px;border-radius:0 0 24px 24px}.brand{display:flex;align-items:center;justify-content:space-between;gap:12px}.logo{font-size:12px;letter-spacing:2px;color:#a9dcd4;font-weight:800}.brand h1{font-size:22px;margin:2px 0 0}.avatar{width:42px;height:42px;border-radius:14px;background:#24505a;display:grid;place-items:center;font-weight:800}.date-line{color:#c0d6d8;font-size:13px;margin-top:18px}.welcome{font-size:25px;font-weight:750;margin-top:5px;letter-spacing:-.6px}.sub{font-size:13px;color:#c0d6d8;margin-top:3px}.content{padding:18px 16px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:22px 0 12px}.section-head h2{font-size:18px;margin:0}.muted{color:var(--muted);font-size:13px}.btn{border:0;border-radius:12px;padding:11px 14px;font-weight:700;background:var(--teal);color:white}.btn.secondary{background:var(--mint);color:var(--teal)}.btn.ghost{background:white;color:var(--ink);border:1px solid var(--line)}.btn.small{padding:8px 10px;font-size:12px}.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:17px}.stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow)}.stat .label{font-size:12px;color:var(--muted)}.stat strong{display:block;font-size:23px;margin:5px 0 0;letter-spacing:-.6px}.stat .hint{font-size:11px;color:var(--teal);margin-top:2px}.quick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.quick button{background:#fff;border:1px solid var(--line);border-radius:15px;padding:13px 5px 11px;color:var(--ink);display:flex;align-items:center;flex-direction:column;gap:7px;font-size:11px;font-weight:700}.quick .ico{height:35px;width:35px;display:grid;place-items:center;border-radius:12px;background:var(--mint);color:var(--teal);font-size:19px}.card{background:white;border:1px solid var(--line);border-radius:17px;padding:14px;box-shadow:var(--shadow);margin-bottom:10px}.job{display:flex;gap:12px;align-items:flex-start}.time{min-width:54px;color:var(--teal);font-size:13px;font-weight:800;padding-top:2px}.job-main{flex:1;min-width:0}.job-main strong{display:block;font-size:14px}.job-main .meta{font-size:12px;color:var(--muted);margin-top:4px}.pill{display:inline-flex;align-items:center;border-radius:99px;padding:4px 8px;font-size:10px;font-weight:800;background:#edf3f4;color:#53666a;white-space:nowrap}.pill.green{background:#e1f5eb;color:#197a52}.pill.orange{background:#fff1d9;color:#946017}.pill.red{background:#fde9e9;color:#a33939}.tabs{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:center;z-index:5;padding:8px max(8px,env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom));}.tabbar{width:100%;max-width:1100px;display:grid;grid-template-columns:repeat(5,1fr);gap:3px}.tab{border:0;background:transparent;color:#7b8a8d;border-radius:12px;padding:7px 2px;font-size:10px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:3px}.tab span{font-size:19px}.tab.active{background:var(--mint);color:var(--teal)}.page-title{font-size:25px;font-weight:800;margin:3px 0 4px}.search{width:100%;border:1px solid var(--line);border-radius:13px;background:white;padding:12px 14px;margin:10px 0 13px;outline-color:var(--teal)}.row{display:flex;align-items:center;justify-content:space-between;gap:12px}.field{margin-bottom:12px}.field label{display:block;font-size:12px;font-weight:750;color:#506368;margin-bottom:5px}.field input,.field select,.field textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:11px;background:#fff;color:var(--ink);outline-color:var(--teal)}.field textarea{min-height:75px;resize:vertical}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 10px}.empty{text-align:center;padding:28px 16px;color:var(--muted)}.empty .big{font-size:32px;margin-bottom:8px}.item-title{font-weight:800}.price{font-weight:800;font-size:16px}.list-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.divider{height:1px;background:var(--line);margin:12px 0}.hidden{display:none!important}.notice{font-size:12px;background:#fff7e8;color:#765521;border-radius:12px;padding:11px;margin:10px 0}.filters{display:flex;gap:7px;overflow:auto;padding:2px 0 8px}.filter{border:1px solid var(--line);border-radius:99px;background:white;padding:8px 12px;font-size:12px;white-space:nowrap}.filter.active{background:var(--navy);color:white;border-color:var(--navy)}.modal-bg{position:fixed;inset:0;background:#061b20a8;z-index:10;display:flex;align-items:flex-end;justify-content:center;padding:0}.modal{background:var(--bg);width:100%;max-width:700px;max-height:92vh;overflow:auto;border-radius:22px 22px 0 0;padding:20px 18px calc(25px + env(safe-area-inset-bottom))}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.modal-head h2{margin:0;font-size:20px}.close{border:0;border-radius:10px;width:35px;height:35px;background:white;font-size:20px}.wide{width:100%}.two-buttons{display:flex;gap:8px}.two-buttons>*{flex:1}.smallnote{font-size:11px;color:var(--muted);margin-top:8px}.filepick{display:block;border:1px dashed #a8c5c3;padding:14px;border-radius:12px;text-align:center;color:var(--teal);font-weight:700;background:#f7fcfb}.photo{width:100%;max-height:220px;object-fit:cover;border-radius:12px;margin-top:9px}.footnote{text-align:center;color:var(--muted);font-size:11px;padding:18px 8px}
+
+.auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:22px;background:var(--bg)}
+.auth-card{width:100%;max-width:420px;background:#fff;border:1px solid var(--line);border-radius:22px;padding:24px;box-shadow:var(--shadow)}
+.auth-brand{font-size:12px;letter-spacing:2px;color:var(--teal);font-weight:800}
+.auth-card h1{font-size:23px;margin:6px 0 5px;color:var(--navy)}
+.auth-card p{font-size:13px;color:var(--muted);margin:0 0 18px}
+.auth-error{color:#a33939;background:#fde9e9;border-radius:10px;padding:10px;font-size:12px;margin:10px 0}
+.auth-status{font-size:12px;color:#c0d6d8;margin-top:8px}
+@media(min-width:720px){.top{padding:28px 30px}.content{padding:22px 28px}.stats{grid-template-columns:repeat(4,minmax(0,1fr))}.app{padding-bottom:30px}.tabs{position:static;border:0;background:transparent;padding:0 24px 14px}.tabbar{background:white;border:1px solid var(--line);border-radius:16px;padding:5px}.tab{flex-direction:row;justify-content:center;font-size:12px;padding:11px}.tab span{font-size:17px}.modal{border-radius:22px;margin:auto}.modal-bg{align-items:center;padding:20px}.quick{grid-template-columns:repeat(4,minmax(0,140px))}}
+</style></head><body>
+<div id="authScreen" class="auth-screen">
+  <section class="auth-card">
+    <div class="auth-brand">THERMOAROU</div>
+    <h1>Σύνδεση στο PRO WORKSPACE</h1>
+    <p>Συνδέσου με τον λογαριασμό σου για να συγχρονίζονται οι πελάτες και οι εργασίες σου μεταξύ κινητού και PC.</p>
+    <form id="authForm">
+      <div class="field"><label for="authEmail">Email</label><input id="authEmail" type="email" autocomplete="username" required></div>
+      <div class="field"><label for="authPassword">Κωδικός πρόσβασης</label><input id="authPassword" type="password" autocomplete="current-password" required></div>
+      <button class="btn wide" id="authSubmit" type="submit">Σύνδεση</button>
+      <div id="authError" class="auth-error hidden"></div>
+      <div class="smallnote">Ο λογαριασμός δημιουργείται από το Firebase Authentication. Η εφαρμογή δεν εμφανίζει ούτε αποθηκεύει τον κωδικό σου.</div>
+    </form>
+  </section>
+</div>
+<div class="app" id="appRoot" style="display:none"><header class="top"><div class="brand"><div><div class="logo">THERMOAROU</div><h1>PRO WORKSPACE</h1></div><button class="avatar" id="logoutBtn" type="button" title="Αποσύνδεση" onclick="signOutUser()">↪</button></div><div class="date-line" id="todayDate"></div><div class="auth-status" id="syncStatus">Έλεγχος σύνδεσης…</div><div class="welcome">Οργάνωσε τη δουλειά σου.</div><div class="sub">Όλα τα έργα, οι πελάτες και τα οικονομικά σου σε ένα σημείο.</div><div class="stats" id="stats"></div></header><main class="content" id="main"></main><nav class="tabs"><div class="tabbar"><button class="tab active" data-page="home"><span>⌂</span>Αρχική</button><button class="tab" data-page="calendar"><span>▦</span>Ημερολόγιο</button><button class="tab" data-page="customers"><span>♙</span>Πελάτες</button><button class="tab" data-page="quotes"><span>▤</span>Προσφορές</button><button class="tab" data-page="more"><span>☷</span>Περισσότερα</button></div></nav></div><div id="modalRoot"></div><script>
+window.firebaseReady = new Promise(resolve => { window.__resolveFirebase = resolve; });
+let currentUser = null;
+const COLLECTIONS=['appointments','customers','quotes','transactions','inventory','projects'];
+function emptyDb(){return {appointments:[],customers:[],quotes:[],transactions:[],inventory:[],projects:[]}}
+function mergeDb(local,cloud){
+  const out=emptyDb();
+  for(const key of COLLECTIONS){
+    const map=new Map();
+    for(const item of (local[key]||[])) map.set(String(item.id),item);
+    for(const item of (cloud[key]||[])) map.set(String(item.id),item);
+    out[key]=Array.from(map.values());
+  }
+  return out;
+}
+window.setSyncStatus = function(message,isError=false){
+  const el=document.getElementById('syncStatus');
+  if(el){el.textContent=message;el.style.color=isError?'#ffd0d0':'#c0d6d8';}
+};
+const KEY='thermoarou-pro-v1';let db=load();let page='home';let calendarFilter='all';let searchText='';
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||seed()}catch(e){return seed()}}
+function seed(){return {appointments:[{id:1,title:'Έλεγχος υδραυλικών',customer:'Παπαδόπουλος Γ.',date:today(),time:'10:00',address:'Καλαμαριά, Θεσσαλονίκη',status:'Προγραμματισμένο',worker:'Εγώ',notes:'Έλεγχος διαρροής'},{id:2,title:'Συντήρηση πισίνας',customer:'Villa Blue',date:today(),time:'13:30',address:'Νικήτη, Χαλκιδική',status:'Προγραμματισμένο',worker:'Συνεργείο',notes:'Έλεγχος φίλτρου'}],customers:[{id:1,name:'Παπαδόπουλος Γ.',phone:'69XXXXXXXX',address:'Καλαμαριά, Θεσσαλονίκη',notes:'Υδραυλική επισκευή'},{id:2,name:'Villa Blue',phone:'69XXXXXXXX',address:'Νικήτη, Χαλκιδική',notes:'Συντήρηση πισίνας'}],quotes:[],transactions:[],inventory:[{id:1,name:'Σωλήνας PPR Φ20',qty:25,unit:'μέτρα',cost:1.2},{id:2,name:'Γωνία PPR Φ20',qty:18,unit:'τεμ.',cost:.35}],projects:[]}}
+function today(){let d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function save(){
+  localStorage.setItem(KEY,JSON.stringify(db));
+  render();
+  if(currentUser && window.firebaseBridge){
+    window.setSyncStatus('Αποθήκευση στο cloud…');
+    window.firebaseBridge.save(db).then(()=>window.setSyncStatus('✓ Συγχρονισμός ενεργός')).catch(err=>{
+      console.error(err);window.setSyncStatus('Σφάλμα συγχρονισμού — τα δεδομένα έμειναν στη συσκευή',true);
+    });
+  }
+}
+function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function euro(n){return new Intl.NumberFormat('el-GR',{style:'currency',currency:'EUR'}).format(Number(n)||0)}
+function niceDate(d){if(!d)return '';return new Date(d+'T12:00:00').toLocaleDateString('el-GR',{weekday:'short',day:'numeric',month:'short'})}
+function setPage(p){page=p;searchText='';document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.page===p));render()}
+function stat(label,value,hint){return `<div class="stat"><div class="label">${label}</div><strong>${value}</strong><div class="hint">${hint}</div></div>`}
+function appointmentCard(a){return `<div class="card"><div class="job"><div class="time">${esc(a.time||'--:--')}</div><div class="job-main"><div class="row"><strong>${esc(a.title)}</strong><span class="pill ${a.status==='Ολοκληρώθηκε'?'green':a.status==='Ακυρώθηκε'?'red':'orange'}">${esc(a.status||'Προγραμματισμένο')}</span></div><div class="meta">${esc(a.customer||'Χωρίς πελάτη')} · ${esc(niceDate(a.date))}</div><div class="meta">⌖ ${esc(a.address||'Δεν έχει οριστεί διεύθυνση')} · ${esc(a.worker||'Εγώ')}</div><div class="list-actions"><button class="btn secondary small" onclick="editAppointment(${a.id})">Επεξεργασία</button><button class="btn ghost small" onclick="openMap('${esc(a.address||'')}')">Χάρτης</button><button class="btn ghost small" onclick="completeAppointment(${a.id})">✓ Ολοκλήρωση</button></div></div></div></div>`}
+function customerCard(c){return `<div class="card"><div class="row"><div><div class="item-title">${esc(c.name)}</div><div class="muted">${esc(c.phone||'Χωρίς τηλέφωνο')}</div><div class="muted">⌖ ${esc(c.address||'Χωρίς διεύθυνση')}</div></div><span class="pill">ΠΕΛΑΤΗΣ</span></div>${c.notes?`<div class="smallnote">${esc(c.notes)}</div>`:''}<div class="list-actions"><button class="btn secondary small" onclick="editCustomer(${c.id})">Επεξεργασία</button><button class="btn ghost small" onclick="openMap('${esc(c.address||'')}')">Άνοιγμα χάρτη</button><button class="btn ghost small" onclick="newAppointmentFor('${esc(c.name)}','${esc(c.address||'')}')">+ Ραντεβού</button></div></div>`}
+function render(){document.getElementById('todayDate').textContent=new Date().toLocaleDateString('el-GR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});let income=db.transactions.filter(x=>x.type==='Έσοδο').reduce((s,x)=>s+Number(x.amount),0),expense=db.transactions.filter(x=>x.type==='Έξοδο').reduce((s,x)=>s+Number(x.amount),0);document.getElementById('stats').innerHTML=stat('Ραντεβού σήμερα',db.appointments.filter(a=>a.date===today()&&a.status!=='Ακυρώθηκε').length,'Στο πρόγραμμα')+stat('Ενεργοί πελάτες',db.customers.length,'Καταχωρημένοι')+stat('Έσοδα καταχωρημένα',euro(income),'Συνολικά')+stat('Καθαρό αποτέλεσμα',euro(income-expense),'Έσοδα − έξοδα');let main=document.getElementById('main');if(page==='home')main.innerHTML=homePage();if(page==='calendar')main.innerHTML=calendarPage();if(page==='customers')main.innerHTML=customersPage();if(page==='quotes')main.innerHTML=quotesPage();if(page==='more')main.innerHTML=morePage()}
+function homePage(){let ap=db.appointments.filter(a=>a.date===today()&&a.status!=='Ακυρώθηκε').sort((a,b)=>(a.time||'').localeCompare(b.time||''));return `<div class="section-head"><h2>Γρήγορες ενέργειες</h2></div><div class="quick"><button onclick="newAppointment()"><span class="ico">＋</span>Ραντεβού</button><button onclick="newCustomer()"><span class="ico">♙</span>Πελάτης</button><button onclick="newQuote()"><span class="ico">€</span>Προσφορά</button><button onclick="newTransaction()"><span class="ico">↕</span>Έξοδο / Έσοδο</button></div><div class="section-head"><h2>Το πρόγραμμα σήμερα</h2><button class="btn secondary small" onclick="setPage('calendar')">Όλα τα ραντεβού →</button></div>${ap.length?ap.map(appointmentCard).join(''):`<div class="card empty"><div class="big">☀</div><strong>Δεν έχεις ραντεβού σήμερα</strong><div class="muted">Πρόσθεσε μια δουλειά για να οργανώσεις την ημέρα σου.</div><button class="btn" style="margin-top:12px" onclick="newAppointment()">+ Νέο ραντεβού</button></div>`}<div class="section-head"><h2>Εκκρεμότητες</h2></div><div class="card"><div class="row"><div><strong>Προσφορές σε αναμονή</strong><div class="muted">Χρειάζονται παρακολούθηση</div></div><strong>${db.quotes.filter(q=>q.status==='Σε αναμονή').length}</strong></div><div class="divider"></div><div class="row"><div><strong>Υλικά με χαμηλό απόθεμα</strong><div class="muted">Ποσότητα 5 ή λιγότερο</div></div><strong>${db.inventory.filter(i=>Number(i.qty)<=5).length}</strong></div></div><div class="footnote">Τα στοιχεία αποθηκεύονται σε αυτή τη συσκευή.</div>`}
+function calendarPage(){let arr=db.appointments.filter(a=>(calendarFilter==='all'||a.date===calendarFilter)&&(`${a.title} ${a.customer} ${a.address}`.toLowerCase().includes(searchText.toLowerCase()))).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));return `<div class="page-title">Ημερολόγιο</div><div class="muted">Ραντεβού, εργασίες και συνεργάτες.</div><div class="row" style="margin-top:14px"><input class="search" style="margin:0" type="date" value="${calendarFilter==='all'?'':calendarFilter}" onchange="calendarFilter=this.value||'all';render()"><button class="btn" onclick="newAppointment()">＋ Προσθήκη</button></div><div class="filters"><button class="filter ${calendarFilter==='all'?'active':''}" onclick="calendarFilter='all';render()">Όλα</button><button class="filter ${calendarFilter===today()?'active':''}" onclick="calendarFilter=today();render()">Σήμερα</button><button class="filter" onclick="calendarFilter=tomorrow();render()">Αύριο</button></div><input class="search" placeholder="Αναζήτηση εργασίας ή πελάτη…" value="${esc(searchText)}" oninput="searchText=this.value;let pos=this.selectionStart;render();let x=document.querySelector('.search:last-of-type');if(x){x.focus();x.setSelectionRange(pos,pos)}">${arr.length?arr.map(appointmentCard).join(''):`<div class="card empty">Δεν βρέθηκαν ραντεβού. Προσπάθησε να προσθέσεις ένα.</div>`}`}
+function tomorrow(){let d=new Date();d.setDate(d.getDate()+1);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function customersPage(){let arr=db.customers.filter(c=>(`${c.name} ${c.phone} ${c.address}`.toLowerCase().includes(searchText.toLowerCase())));return `<div class="page-title">Πελατολόγιο</div><div class="muted">Στοιχεία επικοινωνίας και ιστορικό.</div><div class="row" style="margin-top:12px"><input class="search" style="margin:0" placeholder="Αναζήτηση πελάτη…" value="${esc(searchText)}" oninput="searchText=this.value;render()"><button class="btn" onclick="newCustomer()">＋ Νέος</button></div><div style="margin-top:14px">${arr.length?arr.map(customerCard).join(''):`<div class="card empty">Δεν υπάρχουν πελάτες με αυτά τα στοιχεία.</div>`}</div>`}
+function quotesPage(){return `<div class="page-title">Προσφορές & κοστολόγηση</div><div class="muted">Υπολόγισε υλικά, εργατικά και τελικό κόστος.</div><button class="btn wide" style="margin:15px 0" onclick="newQuote()">＋ Δημιουργία προσφοράς</button>${db.quotes.length?db.quotes.slice().reverse().map(q=>`<div class="card"><div class="row"><div><div class="item-title">${esc(q.title)}</div><div class="muted">${esc(q.customer||'Χωρίς πελάτη')} · ${esc(niceDate(q.date))}</div></div><div class="price">${euro(q.total)}</div></div><div class="row" style="margin-top:10px"><span class="pill ${q.status==='Εγκρίθηκε'?'green':'orange'}">${esc(q.status)}</span><button class="btn ghost small" onclick="quoteStatus(${q.id})">Αλλαγή κατάστασης</button></div><div class="smallnote">Υλικά ${euro(q.materials)} · Εργατικά ${euro(q.labor)} · Κέρδος ${euro(q.profit)}</div></div>`).join(''):`<div class="card empty"><div class="big">▤</div><strong>Δεν έχεις δημιουργήσει προσφορές</strong><div class="muted">Φτιάξε την πρώτη σου προσφορά μέσα σε λίγα δευτερόλεπτα.</div></div>`}`}
+function morePage(){let income=db.transactions.filter(x=>x.type==='Έσοδο').reduce((s,x)=>s+Number(x.amount),0),expense=db.transactions.filter(x=>x.type==='Έξοδο').reduce((s,x)=>s+Number(x.amount),0);return `<div class="page-title">Εργαλεία επιχείρησης</div><div class="muted">Οικονομικά, αποθήκη και φωτογραφίες έργων.</div><div class="section-head"><h2>Έσοδα & έξοδα</h2><button class="btn small" onclick="newTransaction()">＋ Καταχώριση</button></div><div class="stats" style="margin-top:0">${stat('Έσοδα',euro(income),'Καταχωρημένα')}${stat('Έξοδα',euro(expense),'Καταχωρημένα')}</div>${db.transactions.length?db.transactions.slice().reverse().map(t=>`<div class="card"><div class="row"><div><strong>${esc(t.title)}</strong><div class="muted">${esc(niceDate(t.date))} · ${esc(t.category||'Γενικό')}</div></div><div class="price" style="color:${t.type==='Έσοδο'?'var(--teal)':'var(--red)'}">${t.type==='Έξοδο'?'−':'+'}${euro(t.amount)}</div></div></div>`).join(''):`<div class="card empty">Δεν έχουν καταχωρηθεί κινήσεις.</div>`}<div class="section-head"><h2>Υλικά & αποθήκη</h2><button class="btn small" onclick="newInventory()">＋ Υλικό</button></div>${db.inventory.length?db.inventory.map(i=>`<div class="card"><div class="row"><div><strong>${esc(i.name)}</strong><div class="muted">${euro(i.cost)} / ${esc(i.unit)}</div></div><div style="text-align:right"><div class="price">${esc(i.qty)} ${esc(i.unit)}</div><span class="pill ${Number(i.qty)<=5?'red':'green'}">${Number(i.qty)<=5?'Χαμηλό απόθεμα':'Διαθέσιμο'}</span></div></div><div class="list-actions"><button class="btn secondary small" onclick="adjustInventory(${i.id},1)">+ Προσθήκη</button><button class="btn ghost small" onclick="adjustInventory(${i.id},-1)">− Αφαίρεση</button></div></div>`).join(''):`<div class="card empty">Η αποθήκη σου είναι άδεια.</div>`}<div class="section-head"><h2>Φωτογραφίες έργων</h2><button class="btn small" onclick="newProject()">＋ Έργο</button></div>${db.projects.length?db.projects.slice().reverse().map(pr=>`<div class="card"><strong>${esc(pr.title)}</strong><div class="muted">${esc(pr.customer||'')} · ${esc(niceDate(pr.date))}</div>${pr.photo?`<img class="photo" src="${pr.photo}" alt="Φωτογραφία έργου">`:''}${pr.notes?`<div class="smallnote">${esc(pr.notes)}</div>`:''}</div>`).join(''):`<div class="card empty"><div class="big">▧</div><strong>Καταχώρισε το πρώτο έργο</strong><div class="muted">Κράτησε φωτογραφίες και σημειώσεις από κάθε δουλειά.</div></div>`}<div class="notice">Σημείωση: αυτή η πρώτη έκδοση αποθηκεύει δεδομένα μόνο στο συγκεκριμένο κινητό/φυλλομετρητή. Δεν έχει ακόμη συγχρονισμό μεταξύ συνεργατών.</div><div class="card"><strong>Αντίγραφο ασφαλείας</strong><div class="muted" style="margin:5px 0 12px">Κατέβασε τα καταχωρημένα στοιχεία σου σε αρχείο JSON.</div><button class="btn secondary wide" onclick="exportData()">Εξαγωγή δεδομένων</button><div class="divider"></div><label class="filepick">Επαναφορά από αρχείο JSON<input type="file" accept="application/json" hidden onchange="importData(event)"></label></div>`}
+function modal(title,body,onSave){document.getElementById('modalRoot').innerHTML=`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><section class="modal"><div class="modal-head"><h2>${title}</h2><button class="close" onclick="closeModal()">×</button></div><form id="editForm">${body}<button class="btn wide" type="submit">Αποθήκευση</button></form></section></div>`;document.getElementById('editForm').onsubmit=e=>{e.preventDefault();onSave(new FormData(e.target));closeModal();save()}}
+function closeModal(){document.getElementById('modalRoot').innerHTML=''}function val(f,k){return (f.get(k)||'').toString().trim()}function field(label,name,type='text',value='',required=false,extra=''){return `<div class="field"><label>${label}</label><input name="${name}" type="${type}" value="${esc(value)}" ${required?'required':''} ${extra}></div>`}function selectField(label,name,options,value=''){return `<div class="field"><label>${label}</label><select name="${name}">${options.map(o=>`<option ${o===value?'selected':''}>${esc(o)}</option>`).join('')}</select></div>`}function textArea(label,name,value=''){return `<div class="field"><label>${label}</label><textarea name="${name}">${esc(value)}</textarea></div>`}
+function newAppointment(){appointmentForm()}function editAppointment(id){appointmentForm(db.appointments.find(x=>x.id===id))}function newAppointmentFor(customer,address){appointmentForm({customer,address,date:today(),time:'09:00'})}
+function appointmentForm(a={}){let isEdit=!!a.id;modal(isEdit?'Επεξεργασία ραντεβού':'Νέο ραντεβού',`<div class="field"><label>Εργασία / τίτλος</label><input name="title" required value="${esc(a.title||'')}"></div><div class="form-grid">${field('Ημερομηνία','date','date',a.date||today(),true)}${field('Ώρα','time','time',a.time||'09:00',true)}</div><div class="field"><label>Πελάτης</label><input name="customer" list="customerOptions" value="${esc(a.customer||'')}"><datalist id="customerOptions">${db.customers.map(c=>`<option value="${esc(c.name)}">`).join('')}</datalist></div>${field('Διεύθυνση','address','text',a.address||'') }<div class="form-grid">${selectField('Κατάσταση','status',['Προγραμματισμένο','Ολοκληρώθηκε','Ακυρώθηκε'],a.status||'Προγραμματισμένο')}${field('Συνεργάτης','worker','text',a.worker||'Εγώ')}</div>${textArea('Σημειώσεις','notes',a.notes||'')}`,f=>{let item={id:a.id||Date.now(),title:val(f,'title'),date:val(f,'date'),time:val(f,'time'),customer:val(f,'customer'),address:val(f,'address'),status:val(f,'status'),worker:val(f,'worker'),notes:val(f,'notes')};if(isEdit)db.appointments=db.appointments.map(x=>x.id===a.id?item:x);else db.appointments.push(item);});}
+function completeAppointment(id){db.appointments=db.appointments.map(a=>a.id===id?{...a,status:'Ολοκληρώθηκε'}:a);save()}function newCustomer(){customerForm()}function editCustomer(id){customerForm(db.customers.find(x=>x.id===id))}function customerForm(c={}){let edit=!!c.id;modal(edit?'Επεξεργασία πελάτη':'Νέος πελάτης',`${field('Ονοματεπώνυμο / Επωνυμία','name','text',c.name||'',true)}<div class="form-grid">${field('Τηλέφωνο','phone','tel',c.phone||'')}${field('Email','email','email',c.email||'')}</div>${field('Διεύθυνση','address','text',c.address||'')}${textArea('Σημειώσεις','notes',c.notes||'')}`,f=>{let x={...c,id:c.id||Date.now(),name:val(f,'name'),phone:val(f,'phone'),email:val(f,'email'),address:val(f,'address'),notes:val(f,'notes')};if(edit)db.customers=db.customers.map(z=>z.id===c.id?x:z);else db.customers.push(x)})}
+function newQuote(){modal('Νέα προσφορά',`${field('Τίτλος έργου','title','text','',true)}<div class="field"><label>Πελάτης</label><input name="customer" list="quoteCustomers"><datalist id="quoteCustomers">${db.customers.map(c=>`<option value="${esc(c.name)}">`).join('')}</datalist></div><div class="form-grid">${field('Υλικά (€)','materials','number','0',true,'min="0" step="0.01"')}${field('Εργατικά (€)','labor','number','0',true,'min="0" step="0.01"')}</div><div class="form-grid">${field('Πρόσθετα έξοδα (€)','extra','number','0',false,'min="0" step="0.01"')}${field('Κέρδος (%)','margin','number','20',true,'min="0" step="1"')}</div>${field('Ημερομηνία','date','date',today(),true)}${textArea('Περιγραφή / τι περιλαμβάνει','notes','') }<div class="notice">Το τελικό ποσό υπολογίζεται από υλικά + εργατικά + έξοδα και το ποσοστό κέρδους. Δεν υπολογίζεται ΦΠΑ.</div>`,f=>{let materials=+val(f,'materials'),labor=+val(f,'labor'),extra=+val(f,'extra'),profit=(materials+labor+extra)*(+val(f,'margin')/100);db.quotes.push({id:Date.now(),title:val(f,'title'),customer:val(f,'customer'),materials,labor,extra,profit,total:materials+labor+extra+profit,date:val(f,'date'),notes:val(f,'notes'),status:'Σε αναμονή'})})}
+function quoteStatus(id){let q=db.quotes.find(x=>x.id===id);let opts=['Σε αναμονή','Εγκρίθηκε','Απορρίφθηκε'];q.status=opts[(opts.indexOf(q.status)+1)%opts.length];save()}
+function newTransaction(){modal('Νέα οικονομική κίνηση',`${selectField('Τύπος','type',['Έσοδο','Έξοδο'],'Έξοδο')}${field('Περιγραφή','title','text','',true)}<div class="form-grid">${field('Ποσό (€)','amount','number','',true,'min="0.01" step="0.01"')}${field('Ημερομηνία','date','date',today(),true)}</div>${selectField('Κατηγορία','category',['Υλικά','Εργατικά','Καύσιμα / μετακινήσεις','Εξοπλισμός','Πληρωμή πελάτη','Άλλο'],'Άλλο')}${textArea('Σημειώσεις','notes','')}`,f=>db.transactions.push({id:Date.now(),type:val(f,'type'),title:val(f,'title'),amount:+val(f,'amount'),date:val(f,'date'),category:val(f,'category'),notes:val(f,'notes')}))}
+function newInventory(){modal('Προσθήκη υλικού',`${field('Όνομα υλικού','name','text','',true)}<div class="form-grid">${field('Ποσότητα','qty','number','0',true,'min="0" step="0.1"')}${field('Μονάδα','unit','text','τεμ.',true)}</div>${field('Τιμή αγοράς ανά μονάδα (€)','cost','number','0',true,'min="0" step="0.01"')}`,f=>db.inventory.push({id:Date.now(),name:val(f,'name'),qty:+val(f,'qty'),unit:val(f,'unit'),cost:+val(f,'cost')}))}
+function adjustInventory(id,dir){let i=db.inventory.find(x=>x.id===id);if(!i)return;let amount=prompt(dir>0?'Πόση ποσότητα προσθέτεις;':'Πόση ποσότητα αφαιρείς;','1');if(amount===null)return;amount=Number(amount);if(!Number.isFinite(amount)||amount<=0)return alert('Βάλε έγκυρη ποσότητα.');i.qty=Math.max(0,Number(i.qty)+dir*amount);save()}
+let pendingPhoto='';function newProject(){pendingPhoto='';modal('Νέο έργο',`${field('Όνομα έργου','title','text','',true)}<div class="field"><label>Πελάτης</label><input name="customer" list="projCustomers"><datalist id="projCustomers">${db.customers.map(c=>`<option value="${esc(c.name)}">`).join('')}</datalist></div>${field('Ημερομηνία','date','date',today(),true)}${textArea('Σημειώσεις','notes','')}<div class="field"><label>Φωτογραφία έργου</label><label class="filepick">📷 Επιλογή φωτογραφίας από τη συσκευή<input id="projectPhoto" type="file" accept="image/*" hidden></label><div id="photoPreview"></div></div>`,f=>db.projects.push({id:Date.now(),title:val(f,'title'),customer:val(f,'customer'),date:val(f,'date'),notes:val(f,'notes'),photo:pendingPhoto}));let input=document.getElementById('projectPhoto');input.onchange=()=>{let file=input.files[0];if(!file)return;let r=new FileReader();r.onload=()=>{pendingPhoto=r.result;document.getElementById('photoPreview').innerHTML=`<img class="photo" src="${pendingPhoto}" alt="Προεπισκόπηση">`};r.readAsDataURL(file)}}
+function openMap(address){if(!address){alert('Δεν έχει καταχωρηθεί διεύθυνση.');return}window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(address),'_blank')}
+function exportData(){let blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='thermoarou-pro-backup-'+today()+'.json';a.click();URL.revokeObjectURL(url)}function importData(e){let file=e.target.files[0];if(!file)return;let r=new FileReader();r.onload=()=>{try{let d=JSON.parse(r.result);if(!d.appointments||!d.customers)throw Error();if(confirm('Η επαναφορά θα αντικαταστήσει τα τρέχοντα δεδομένα. Συνέχεια;')){db=d;save();alert('Η επαναφορά ολοκληρώθηκε.')}}catch(err){alert('Το αρχείο δεν είναι έγκυρο αντίγραφο ασφαλείας.')}};r.readAsText(file)}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>setPage(b.dataset.page)));
+window.signOutUser = async function(){
+  if(!window.firebaseBridge)return;
+  try{await window.firebaseBridge.signOut()}catch(e){alert('Δεν έγινε αποσύνδεση. Δοκίμασε ξανά.')}
+};
+window.onFirebaseAuthChanged = async function(user){
+  currentUser=user||null;
+  const authScreen=document.getElementById('authScreen');
+  const appRoot=document.getElementById('appRoot');
+  if(!user){
+    appRoot.style.display='none';authScreen.style.display='flex';
+    window.setSyncStatus('');return;
+  }
+  authScreen.style.display='none';appRoot.style.display='block';
+  window.setSyncStatus('Σύνδεση και έλεγχος δεδομένων…');
+  try{
+    const raw=localStorage.getItem(KEY);
+    const local=load();
+    db=await window.firebaseBridge.loadAndSync(local,raw!==null);
+    localStorage.setItem(KEY,JSON.stringify(db));
+    render();
+    window.setSyncStatus('✓ Συγχρονισμός ενεργός · '+user.email);
+  }catch(e){
+    console.error(e);
+    window.setSyncStatus('Δεν έγινε συγχρονισμός. Έλεγξε τους κανόνες Firestore.',true);
+    render();
+    alert('Η σύνδεση έγινε, αλλά απέτυχε ο συγχρονισμός με το Firestore. Έλεγξε τους κανόνες ασφαλείας και δοκίμασε ξανά. Τα τοπικά δεδομένα παραμένουν στη συσκευή.');
+  }
+};
+window.firebaseReady.then(bridge=>{window.firebaseBridge=bridge;});
+</script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
+import { getFirestore, collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDBSVAmevph69k4vx90ZW30WSYJaa8I3Rs",
+  authDomain: "thermoarou-c1018.firebaseapp.com",
+  projectId: "thermoarou-c1018",
+  storageBucket: "thermoarou-c1018.firebasestorage.app",
+  messagingSenderId: "871595692652",
+  appId: "1:871595692652:web:79a7fd5646cf6253cffe49",
+  measurementId: "G-WTSTJVLGPG"
+};
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const firestore=getFirestore(app);
+const names=['appointments','customers','quotes','transactions','inventory','projects'];
+let saveQueue=Promise.resolve();
+
+async function readCloud(uid){
+  const result={appointments:[],customers:[],quotes:[],transactions:[],inventory:[],projects:[]};
+  for(const name of names){
+    const snap=await getDocs(collection(firestore,'users',uid,name));
+    result[name]=snap.docs.map(d=>d.data());
+  }
+  return result;
+}
+function mergeRecords(local,cloud){
+  const result={appointments:[],customers:[],quotes:[],transactions:[],inventory:[],projects:[]};
+  for(const name of names){
+    const map=new Map();
+    for(const item of (local[name]||[]))map.set(String(item.id),item);
+    for(const item of (cloud[name]||[]))map.set(String(item.id),item);
+    result[name]=Array.from(map.values());
+  }
+  return result;
+}
+async function writeCloud(uid,data){
+  for(const name of names){
+    const items=data[name]||[];
+    for(const item of items){
+      const id=String(item.id);
+      const payload={...item};
+      // Avoid Firestore's 1 MiB document limit for oversized embedded photos.
+      if(name==='projects' && payload.photo && payload.photo.length>850000){
+        throw new Error('Η φωτογραφία έργου είναι πολύ μεγάλη για συγχρονισμό. Επίλεξε μικρότερη φωτογραφία.');
+      }
+      await setDoc(doc(firestore,'users',uid,name,id),payload);
+    }
+  }
+}
+const bridge={
+  signIn:(email,password)=>signInWithEmailAndPassword(auth,email,password),
+  signOut:()=>signOut(auth),
+  async loadAndSync(local,hasLocal){
+    const uid=auth.currentUser.uid;
+    const cloud=await readCloud(uid);
+    const cloudHasData=names.some(n=>cloud[n].length>0);
+    let combined;
+    if(cloudHasData){
+      const base=hasLocal?local:{appointments:[],customers:[],quotes:[],transactions:[],inventory:[],projects:[]};
+      combined=mergeRecords(base,cloud);
+    }else{
+      combined=local;
+    }
+    await writeCloud(uid,combined);
+    return combined;
+  },
+  save(data){
+    const uid=auth.currentUser?.uid;
+    if(!uid)return Promise.resolve();
+    saveQueue=saveQueue.catch(()=>{}).then(()=>writeCloud(uid,data));
+    return saveQueue;
+  }
+};
+window.firebaseBridge=bridge;
+window.__resolveFirebase(bridge);
+onAuthStateChanged(auth,user=>{
+  if(typeof window.onFirebaseAuthChanged==='function')window.onFirebaseAuthChanged(user);
+});
+const form=document.getElementById('authForm');
+form.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const button=document.getElementById('authSubmit');
+  const error=document.getElementById('authError');
+  error.classList.add('hidden');error.textContent='';
+  button.disabled=true;button.textContent='Σύνδεση…';
+  try{
+    await bridge.signIn(document.getElementById('authEmail').value.trim(),document.getElementById('authPassword').value);
+  }catch(err){
+    error.textContent=err.code==='auth/invalid-credential'?'Το email ή ο κωδικός δεν είναι σωστός.':err.code==='auth/too-many-requests'?'Πολλές προσπάθειες. Περίμενε λίγο και δοκίμασε ξανά.':'Δεν έγινε σύνδεση. Έλεγξε email, κωδικό και σύνδεση στο internet.';
+    error.classList.remove('hidden');
+  }finally{
+    button.disabled=false;button.textContent='Σύνδεση';
+  }
+});
+</script></body></html>
