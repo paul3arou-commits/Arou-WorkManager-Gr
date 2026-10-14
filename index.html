@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Arou WorkManager GR</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50: '#f0f9ff', 100: '#e0f2fe', 500: '#0284c7', 600: '#0284c7', 700: '#0369a1' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); }
+    .dark .glass { background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(12px); }
+    body { -webkit-tap-highlight-color: transparent; }
+  </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-200 pb-24">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 p-3">
+    <div class="max-w-5xl mx-auto glass rounded-2xl shadow-lg border border-slate-200/50 dark:border-slate-700/50 p-3 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2.5">
+        <div class="bg-blue-600 text-white p-2.5 rounded-xl shadow-md">
+          <i class="fa-solid fa-briefcase text-lg"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-base leading-tight">Arou WorkManager GR</h1>
+          <p id="syncStatus" class="text-[10px] text-slate-500 dark:text-slate-400">Local Mode (Offline)</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="toggleDarkMode()" class="p-2 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-amber-400">
+          <i id="themeIcon" class="fa-solid fa-moon text-base"></i>
+        </button>
+        <button onclick="openModal('job')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-xl font-medium text-xs flex items-center gap-1 shadow-md">
+          <i class="fa-solid fa-plus"></i> Νέα
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-3 space-y-4">
+
+    <!-- Period Selector -->
+    <div class="flex items-center justify-between bg-white dark:bg-slate-800 p-2 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+      <span class="text-xs font-bold text-slate-500 dark:text-slate-400 pl-2">📊 ΣΥΝΟΨΗ:</span>
+      <div class="flex items-center gap-1 text-xs font-medium">
+        <button onclick="setPeriod('week')" id="btnPeriodWeek" class="px-3 py-1.5 rounded-xl border transition">🗓️ Εβδομάδα</button>
+        <button onclick="setPeriod('month')" id="btnPeriodMonth" class="px-3 py-1.5 rounded-xl border transition">📅 Μήνας</button>
+        <button onclick="setPeriod('all')" id="btnPeriodAll" class="px-3 py-1.5 rounded-xl border transition">🌐 Όλα</button>
+      </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div onclick="openBreakdownModal('paid')" class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm cursor-pointer hover:border-emerald-500 transition">
+        <div class="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">
+          <span>🟢 ΕΕΙΣΠΡΑΧΘΗΚΑΝ</span>
+          <i class="fa-solid fa-circle-info text-emerald-500"></i>
+        </div>
+        <div id="statPaid" class="text-xl font-bold text-emerald-600 dark:text-emerald-400">0 €</div>
+      </div>
+
+      <div onclick="openBreakdownModal('unpaid')" class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm cursor-pointer hover:border-rose-500 transition">
+        <div class="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">
+          <span>🔴 ΜΑΣ ΧΡΩΣΤΑΝΕ</span>
+          <i class="fa-solid fa-circle-info text-rose-500"></i>
+        </div>
+        <div id="statPending" class="text-xl font-bold text-rose-600 dark:text-rose-400">0 €</div>
+      </div>
+
+      <div onclick="openBreakdownModal('expense')" class="bg-amber-50 dark:bg-amber-950/30 p-3.5 rounded-2xl border border-amber-300 dark:border-amber-800 shadow-sm cursor-pointer hover:border-amber-500 transition">
+        <div class="flex items-center justify-between text-xs font-semibold text-amber-700 dark:text-amber-400 mb-1">
+          <span>🟡 ΕΞΟΔΑ</span>
+          <i class="fa-solid fa-circle-info text-amber-500"></i>
+        </div>
+        <div id="statExpenses" class="text-xl font-bold text-amber-600 dark:text-amber-400">0 €</div>
+      </div>
+
+      <div onclick="openBreakdownModal('profit')" class="bg-white dark:bg-slate-800 p-
