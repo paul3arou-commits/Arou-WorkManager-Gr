@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arou WorkManager GR</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Tailwind Configuration -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50: '#f0f9ff', 100: '#e0f2fe', 500: '#0284c7', 600: '#0284c7', 700: '#0369a1' }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); }
+    .dark .glass { background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(12px); }
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(0.5);
+    }
+  </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-200 pb-12 font-sans select-none">
+
+  <!-- Floating Navigation Header -->
+  <header class="sticky top-0 z-40 p-3">
+    <div class="max-w-5xl mx-auto glass rounded-2xl shadow-lg border border-slate-200/50 dark:border-slate-700/50 p-3 flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Branding Section -->
+      <div class="flex items-center gap-3">
+        <div class="bg-blue-600 text-white p-2.5 rounded-xl shadow-md flex items-center justify-center">
+          <i class="fa-solid fa-briefcase text-xl"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-lg leading-tight tracking-wide">Arou WorkManager GR</h1>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Διαχείριση Εργασιών & Οικονομικών</p>
+        </div>
+      </div>
+
+      <!-- Search, Dark Mode & New Entry Action -->
+      <div class="flex items-center gap-2 flex-grow sm:flex-grow-0 w-full sm:w-auto">
+        <div class="relative flex-grow sm:w-64">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+          <input type="text" id="searchInput" oninput="renderApp()" placeholder="Αναζήτηση..." 
+                 class="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+        </div>
+
+        <button onclick="toggleDarkMode()" aria-label="Dark Mode Toggle" class="p-2.5 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-amber-400 hover:opacity-80 transition flex items-center justify-center">
+          <i id="themeIcon" class="fa-solid fa-moon text-lg"></i>
+        </button>
+
+        <button onclick="openModal()" class="bg-blue-600 hover:bg-blue-700 active:scale-95 text-white px-3.5 py-2 rounded-xl font-medium text-sm flex items-center gap-1.5 shadow-md transition">
+          <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Νέα</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-3 space-y-4">
+
+    <!-- Period Summary Selector -->
+    <div class="flex items-center justify-between bg-white dark:bg-slate-800 p-2 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+      <span class="text-xs font-bold text-slate-500 dark:text-slate-400 pl-2">📊 ΣΥΝΟΨΗ:</span>
+      <div class="flex items-center gap-1 text-xs font-medium">
+        <button onclick="setPeriod('week')" id="btnPeriodWeek" class="px-3 py-1.5 rounded-xl border transition">🗓️ Εβδομαδιαία</button>
+        <button onclick="setPeriod('month')" id="btnPeriodMonth" class="px-3 py-1.5 rounded-xl border transition">📅 Μηνιαία</button>
+        <button onclick="setPeriod('all')" id="btnPeriodAll" class="px-3 py-1.5 rounded-xl border transition">🌐 Συνολικά</button>
+      </div>
+    </div>
+
+    <!-- Financial Stat Cards -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div onclick="showStatDetailModal('paid')" class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm cursor-pointer hover:border-emerald-500 hover:scale-[1.02] transition">
+        <div class="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">
+          <span>🟢 ΕΙΣΠΡΑΧΘΗΚΑΝ</span>
+          <i class="fa-solid fa-circle-check text-emerald-500"></i>
+        </div>
+        <div id="statPaid" class="text-xl font-bold text-emerald-600 dark:text-emerald-400">0.00 €</div>
+        <div class="text-[10px] text-slate-400 mt-1 flex items-center gap-1"><i class="fa-solid fa-circle-info"></i> Πάτα για ανάλυση</div>
+      </div>
+
+      <div onclick="showStatDetailModal('unpaid')" class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm cursor-pointer hover:border-rose-500 hover:scale-[1.02] transition">
+        <div class="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">
+          <span>🔴 ΜΑΣ ΧΡΩΣΤΑΝΕ</span>
+          <i class="fa-solid fa-hand-holding-dollar text-rose-500"></i>
+        </div>
+        <div id="statPending" class="text-xl font-bold text-rose-600 dark:text-rose-400">0.00 €</div>
+        <div class="text-[10px] text-slate-400 mt-1 flex items-center gap-1"><i class="fa-solid fa-circle-info"></i> Πάτα για ανάλυση</div>
+      </div>
+
+      <div onclick="showStatDetailModal('expenses')" class="bg-amber-50 dark:bg-amber-950/30 p-3.5 rounded-2xl border border-amber-300 dark:border-amber-800 shadow-sm cursor-pointer hover:border-amber-500 hover:scale-[1.02] transition">
+        <div class="flex items-center justify-between text-xs font-semibold text-amber-700 dark:text-amber-400 mb-1">
+          <span>🟡 ΕΞΟΔΑ</span>
+          <i class="fa-solid fa-receipt text-amber-500"></i>
+        </div>
+        <div id="statExpenses" class="text-xl font-bold text-amber-600 dark:text-amber-400">0.00 €</div>
+        <div class="text-[10px] text-amber-600/70 dark:text-amber-400/70 mt-1 flex items-center gap-1"><i class="fa-solid fa-circle-info"></i> Πάτα για ανάλυση</div>
+      </div>
+
+      <div onclick="showStatDetailModal('profit')" class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm cursor-pointer hover:border-blue-500 hover:scale-[1.02] transition">
+        <div class="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">
+          <span>💎 ΚΕΡΔΟΣ</span>
+          <i class="fa-solid fa-chart-line text-blue-500"></i>
+        </div>
+        <div id="statProfit" class="text-xl font-bold text-blue-600 dark:text-blue-400">0.00 €</div>
+        <div class="text-[10px] text-slate-400 mt-1 flex items-center gap-1"><i class="fa-solid fa-circle-info"></i> Πάτα για ανάλυση</div>
+      </div>
+    </div>
+
+    <!-- Calendar View Section -->
+    <section class="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-calendar-days text-blue-600 text-lg"></i>
+          <h2 id="calendarMonth" class="font-bold text-slate-800 dark:text-slate-100 text-base"></h2>
+        </div>
+        <div class="flex gap-1">
+          <button onclick="prevMonth()" class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition"><i class="fa-solid fa-chevron-left"></i></button>
+          <button onclick="nextMonth()" class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+      </div>
+
+      <!-- Days of week headers -->
+      <div class="grid grid-cols-7 gap-1 text-center font-bold text-xs text-slate-400 mb-2">
+        <div>ΔΕΥ</div><div>ΤΡΙ</div><div>ΤΕΤ</div><div>ΠΕΜ</div><div>ΠΑΡ</div><div>ΣΑΒ</div><div>ΚΥΡ</div>
+      </div>
+
+      <!-- Calendar Days Grid -->
+      <div id="calendarDays" class="grid grid-cols-7 gap-1 text-xs"></div>
+    </section>
+
+    <!-- Filters Bar -->
+    <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+      <button onclick="setFilter('all')" id="btnFilterAll" class="px-3.5 py-1.5 rounded-xl border bg-blue-600 text-white font-semibold">Όλα</button>
+      <button onclick="setFilter('pending')" id="btnFilterPending" class="px-3.5 py-1.5 rounded-xl border bg-white dark:bg-slate-800">🔴 Εκκρεμή</button>
+      <button onclick="setFilter('completed')" id="btnFilterCompleted" class="px-3.5 py-1.5 rounded-xl border bg-white dark:bg-slate-800">🟢 Εξοφλημένα</button>
+      <button onclick="setFilter('expense')" id="btnFilterExpense" class="px-3.5 py-1.5 rounded-xl border bg-white dark:bg-slate-800">🟡 Έξοδα</button>
+    </div>
+
+    <!-- Items List Container -->
+    <div id="itemsContainer" class="space-y-3"></div>
+
+  </main>
+
+  <!-- Modal Form -->
+  <div id="modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 w-full max-w-lg max-h-[90vh] overflow-y-auto p-5 transition-all">
+      <div class="flex justify-between items-center mb-4">
+        <h3 id="modalTitle" class="font-bold text-slate-800 dark:text-slate-100 text-lg">Νέα Καταχώρηση</h3>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <form id="jobForm" onsubmit="saveJob(event)" class="space-y-4 text-sm">
+        <input type="hidden" id="editId">
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-medium mb-1 text-slate-600 dark:text-slate-300">Τύπος</label>
+            <select id="type" onchange="toggleExpenseFields()" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 font-medium">
+              <option value="job">🛠️ Εργασία / Πελάτης</option>
+              <option value="expense">🟡 Έξοδο</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-medium mb-1 text-slate-600 dark:text-slate-300">Ημερομηνία</label>
+            <input type="date" id="date" required class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-medium mb-1 text-slate-600 dark:text-slate-300">Τίτλος / Περιγραφή</label>
+          <input type="text" id="title" required placeholder="π.χ. Τοποθέτηση A/C, Ανακαινιση" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700">
+        </div>
+
+        <div id="expenseCategoryGroup" class="hidden space-y-3 bg-amber-50 dark:bg-amber-950/30 p-3 rounded-xl border border-amber-200 dark:border-amber-800">
+          <div class="flex justify-between items-center">
+            <label class="block font-bold text-amber-800 dark:text-amber-300">Αναλυτικά Έξοδα</label>
+            <button type="button" onclick="addExpenseRow()" class="text-xs bg-amber-600 hover:bg-amber-700 text-white font-medium px-2.5 py-1 rounded-lg transition"><i class="fa-solid fa-plus"></i> Προσθήκη Γραμμής</button>
+          </div>
+
+          <div id="expenseRowsContainer" class="space-y-2"></div>
+
+          <div class="flex justify-between items-center pt-2 border-t border-amber-200 dark:border-amber-800 font-bold text-amber-900 dark:text-amber-200">
+            <span>Σύνολο Εξόδων:</span>
+            <span id="expenseCalculatedTotal">0.00 €</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-medium mb-1 text-slate-600 dark:text-slate-300">Τοποθεσία (Google Maps)</label>
+          <input type="text" id="location" placeholder="π.χ. Τσιμισκή 45, Θεσσαλονίκη" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-medium mb-1 text-slate-600 dark:text-slate-300">Συνολικό Ποσό (€)</label>
+            <input type="number" step="0.01" id="amount" required placeholder="0.00" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700">
+          </div>
+          <div id="paidInputContainer">
+            <label class="block font-medium mb-1 text-slate-600 dark:text-slate-300">Εισπράχθηκαν (€)</label>
+            <input type="number" step="0.01" id="paid" placeholder="0.00" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-medium mb-1 text-slate-600 dark:text-slate-300">Σημειώσεις</label>
+          <textarea id="notes" rows="2" placeholder="Επιπλέον λεπτομέρειες..." class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700"></textarea>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3">
+          <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-medium">Ακύρωση</button>
+          <button type="submit" class="px-4 py-2 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 transition">Αποθήκευση</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Detailed Summary Modal -->
+  <div id="statDetailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 w-full max-w-lg overflow-hidden transition-all transform flex flex-col max-h-[85vh]">
+      <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+        <div>
+          <h3 id="statDetailTitle" class="font-bold text-slate-800 dark:text-slate-100 text-base">Αναλυτική Αναφορά</h3>
+          <p id="statDetailSubtitle" class="text-xs text-slate-500 dark:text-slate-400"></p>
+        </div>
+        <button onclick="closeStatDetailModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg transition"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div id="statDetailContent" class="p-4 overflow-y-auto space-y-3 flex-grow text-sm"></div>
+
+      <div class="p-3 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-right">
+        <button onclick="closeStatDetailModal()" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-medium hover:opacity-80 transition text-xs">Κλείσιμο</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let jobs = JSON.parse(localStorage.getItem('arou_wm_jobs')) || [];
+    let currentDate = new Date();
+    let currentFilter = 'all';
+    let currentPeriod = 'month';
+    let selectedDate = null;
+    let expenseRowCounter = 0;
+
+    const categoryLabels = {
+      fuel: '⛽ Βενζίνη',
+      materials: '🧱 Υλικά',
+      food: '🍕 Φαγητό',
+      other: '🛠️ Άλλο'
+    };
+
+    function addExpenseRow(cat = 'fuel', title = '', amount = '') {
+      expenseRowCounter++;
+      const rowId = `exp_row_${expenseRowCounter}`;
+      const container = document.getElementById('expenseRowsContainer');
+
+      const div = document.createElement('div');
+      div.id = rowId;
+      div.className = 'flex items-center gap-2 expense-row';
+      div.innerHTML = `
+        <select class="exp-cat p-2 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700">
+          <option value="fuel" ${cat==='fuel'?'selected':''}>⛽ Βενζίνη</option>
+          <option value="materials" ${cat==='materials'?'selected':''}>🧱 Υλικά</option>
+          <option value="food" ${cat==='food'?'selected':''}>🍕 Φαγητό</option>
+          <option value="other" ${cat==='other'?'selected':''}>🛠️ Άλλο</option>
+        </select>
+        <input type="text" placeholder="Περιγραφή..." value="${title}" class="exp-title flex-grow p-2 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700">
+        <input type="number" step="0.01" placeholder="€" value="${amount}" oninput="calculateExpenseTotal()" class="exp-amount w-20 p-2 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 font-bold">
+        <button type="button" onclick="removeExpenseRow('${rowId}')" class="text-rose-500 hover:text-rose-700 p-1.5"><i class="fa-solid fa-trash-can"></i></button>
+      `;
+      container.appendChild(div);
+      calculateExpenseTotal();
+    }
+
+    function removeExpenseRow(rowId) {
+      const row = document.getElementById(rowId);
+      if (row) row.remove();
+      calculateExpenseTotal();
+    }
+
+    function calculateExpenseTotal() {
+      const type = document.getElementById('type').value;
+      if (type !== 'expense') return;
+
+      const rowAmounts = document.querySelectorAll('.exp-amount');
+      let total = 0;
+      rowAmounts.forEach(input => {
+        total += Number(input.value || 0);
+      });
+
+      document.getElementById('expenseCalculatedTotal').innerText = total.toFixed(2) + ' €';
+      document.getElementById('amount').value = total > 0 ? total.toFixed(2) : '';
+    }
+
+    function showStatDetailModal(type) {
+      const modal = document.getElementById('statDetailModal');
+      const titleEl = document.getElementById('statDetailTitle');
+      const subtitleEl = document.getElementById('statDetailSubtitle');
+      const contentEl = document.getElementById('statDetailContent');
+
+      contentEl.innerHTML = '';
+      let periodText = currentPeriod === 'week' ? 'Τρέχουσα Εβδομάδα' : (currentPeriod === 'month' ? 'Τρέχων Μήνας' : 'Όλες οι εγγραφές');
+      subtitleEl.innerText = periodText;
+
+      const filteredJobs = jobs.filter(j => isDateInPeriod(j.date));
+
+      if (type === 'paid') {
+        titleEl.innerText = '🟢 Αναφορά Εισπράξεων';
+        const items = filteredJobs.filter(j => j.type !== 'expense' && Number(j.paid) > 0);
+        let total = 0;
+
+        if (items.length === 0) {
+          contentEl.innerHTML = '<div class="text-center py-6 text-slate-400">Δεν υπάρχουν εισπράξεις για αυτή την περίοδο.</div>';
+        } else {
+          items.forEach(j => {
+            total += Number(j.paid);
+            contentEl.innerHTML += `
+              <div class="p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50 flex justify-between items-center">
+                <div>
+                  <div class="font-bold text-slate-800 dark:text-slate-100">${j.title}</div>
+                  <div class="text-xs text-slate-400">📅 ${j.date} ${j.location ? '• 📍 ' + j.location : ''}</div>
+                </div>
+                <div class="text-right">
+                  <div class="font-bold text-emerald-600 dark:text-emerald-400 text-base">+${Number(j.paid).toFixed(2)} €</div>
+                  <div class="text-[10px] text-slate-400">Σύνολο έργου: ${Number(j.amount).toFixed(2)} €</div>
+                </div>
+              </div>
+            `;
+          });
+          contentEl.innerHTML = `
+            <div class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 flex justify-between items-center mb-2">
+              <span class="font-bold text-emerald-800 dark:text-emerald-300">Συνολικές Εισπράξεις:</span>
+              <span class="font-extrabold text-emerald-600 dark:text-emerald-400 text-lg">${total.toFixed(2)} €</span>
+            </div>
+          ` + contentEl.innerHTML;
+        }
+      } 
+      else if (type === 'unpaid') {
+        titleEl.innerText = '🔴 Αναφορά Οφειλών (Μας Χρωστάνε)';
+        const items = filteredJobs.filter(j => j.type !== 'expense' && Number(j.amount) > Number(j.paid));
+        let totalUnpaid = 0;
+
+        if (items.length === 0) {
+          contentEl.innerHTML = '<div class="text-center py-6 text-slate-400">Δεν υπάρχουν ανεξόφλητες οφειλές.</div>';
+        } else {
+          items.forEach(j => {
+            const due = Number(j.amount) - Number(j.paid);
+            totalUnpaid += due;
+            contentEl.innerHTML += `
+              <div class="p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50 flex justify-between items-center">
+                <div>
+                  <div class="font-bold text-slate-800 dark:text-slate-100">${j.title}</div>
+                  <div class="text-xs text-slate-400">📅 ${j.date} ${j.location ? '• 📍 ' + j.location : ''}</div>
+                </div>
+                <div class="text-right">
+                  <div class="font-bold text-rose-600 dark:text-rose-400 text-base">${due.toFixed(2)} €</div>
+                  <div class="text-[10px] text-slate-400">Έναντι ${Number(j.amount).toFixed(2)} € (Πληρώθηκε: ${Number(j.paid).toFixed(2)} €)</div>
+                </div>
+              </div>
+            `;
+          });
+          contentEl.innerHTML = `
+            <div class="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 flex justify-between items-center mb-2">
+              <span class="font-bold text-rose-800 dark:text-rose-300">Συνολικό Ανεξόφλητο Υπόλοιπο:</span>
+              <span class="font-extrabold text-rose-600 dark:text-rose-400 text-lg">${totalUnpaid.toFixed(2)} €</span>
+            </div>
+          ` + contentEl.innerHTML;
+        }
+      }
+      else if (type === 'expenses') {
+        titleEl.innerText = '🟡 Αναλυτική Κατάσταση Εξόδων';
+        const expenseJobs = filteredJobs.filter(j => j.type === 'expense');
+        let grandTotal = 0;
+        let categoryTotals = { fuel: 0, materials: 0, food: 0, other: 0 };
+
+        expenseJobs.forEach(j => {
+          grandTotal += Number(j.amount || 0);
+          if (j.expenseItems && j.expenseItems.length > 0) {
+            j.expenseItems.forEach(item => {
+              if (categoryTotals[item.category] !== undefined) {
+                categoryTotals[item.category] += Number(item.amount || 0);
+              } else {
+                categoryTotals.other += Number(item.amount || 0);
+              }
+            });
+          }
+        });
+
+        if (expenseJobs.length === 0) {
+          contentEl.innerHTML = '<div class="text-center py-6 text-slate-400">Δεν καταγράφηκαν έξοδα για αυτή την περίοδο.</div>';
+        } else {
+          let summaryHtml = `
+            <div class="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 mb-3 space-y-2">
+              <div class="flex justify-between items-center border-b border-amber-200 dark:border-amber-800 pb-1.5">
+                <span class="font-bold text-amber-800 dark:text-amber-300">Συνολικά Έξοδα:</span>
+                <span class="font-extrabold text-amber-600 dark:text-amber-400 text-lg">${grandTotal.toFixed(2)} €</span>
+              </div>
+              <div class="grid grid-cols-2 gap-1.5 text-xs">
+                <div class="bg-white/60 dark:bg-slate-800/60 p-1.5 rounded-lg">⛽ Βενζίνες: <b>${categoryTotals.fuel.toFixed(2)} €</b></div>
+                <div class="bg-white/60 dark:bg-slate-800/60 p-1.5 rounded-lg">🧱 Υλικά: <b>${categoryTotals.materials.toFixed(2)} €</b></div>
+                <div class="bg-white/60 dark:bg-slate-800/60 p-1.5 rounded-lg">🍕 Φαγητά: <b>${categoryTotals.food.toFixed(2)} €</b></div>
+                <div class="bg-white/60 dark:bg-slate-800/60 p-1.5 rounded-lg">🛠️ Άλλα: <b>${categoryTotals.other.toFixed(2)} €</b></div>
+              </div>
+            </div>
+          `;
+
+          let listHtml = '';
+          expenseJobs.forEach(j => {
+            let itemsDetail = '';
+            if (j.expenseItems && j.expenseItems.length > 0) {
+              itemsDetail = `
+                <div class="mt-2 space-y-1">
+                  ${j.expenseItems.map(ei => `
+                    <div class="flex justify-between text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">
+                      <span>${categoryLabels[ei.category] || '🟡'} ${ei.title || 'Χωρίς περιγραφή'}</span>
+                      <span class="font-bold">${Number(ei.amount).toFixed(2)} €</span>
+                    </div>
+                  `).join('')}
+                </div>
+              `;
+            }
+
+            listHtml += `
+              <div class="p-3 rounded-xl border border-amber-200 dark:border-amber-800/60 bg-amber-50/30 dark:bg-slate-700/40 space-y-1">
+                <div class="flex justify-between items-center">
+                  <span class="font-bold text-slate-800 dark:text-slate-100">${j.title}</span>
+                  <span class="font-bold text-amber-600 dark:text-amber-400">${Number(j.amount).toFixed(2)} €</span>
+                </div>
+                <div class="text-xs text-slate-400">📅 ${j.date}</div>
+                ${itemsDetail}
+              </div>
+            `;
+          });
+
+          contentEl.innerHTML = summaryHtml + listHtml;
+        }
+      }
+      else if (type === 'profit') {
+        titleEl.innerText = '💎 Ισοζύγιο & Καθαρό Κέρδος';
+        let paidTotal = 0, expenseTotal = 0;
+
+        filteredJobs.forEach(j => {
+          if (j.type === 'expense') expenseTotal += Number(j.amount || 0);
+          else paidTotal += Number(j.paid || 0);
+        });
+
+        const profit = paidTotal - expenseTotal;
+
+        contentEl.innerHTML = `
+          <div class="p-4 rounded-xl ${profit >= 0 ? 'bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-800' : 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800'} border text-center space-y-1">
+            <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Καθαρό Αποτέλεσμα</div>
+            <div class="text-2xl font-extrabold ${profit >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-rose-600 dark:text-rose-400'}">${profit.toFixed(2)} €</div>
+          </div>
+
+          <div class="space-y-2 pt-2">
+            <div class="p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-emerald-50/50 dark:bg-emerald-950/30 flex justify-between items-center">
+              <span class="font-medium text-emerald-800 dark:text-emerald-300">🟢 Σύνολο Εισπράξεων:</span>
+              <span class="font-bold text-emerald-600 dark:text-emerald-400">+${paidTotal.toFixed(2)} €</span>
+            </div>
+            <div class="p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-amber-50/50 dark:bg-amber-950/30 flex justify-between items-center">
+              <span class="font-medium text-amber-800 dark:text-amber-300">🟡 Σύνολο Εξόδων:</span>
+              <span class="font-bold text-amber-600 dark:text-amber-400">-${expenseTotal.toFixed(2)} €</span>
+            </div>
+          </div>
+        `;
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeStatDetailModal() {
+      document.getElementById('statDetailModal').classList.add('hidden');
+    }
+
+    function init() {
+      if (localStorage.getItem('arou_wm_theme') === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.getElementById('themeIcon').className = 'fa-solid fa-sun text-amber-400';
+      }
+      setPeriod('month');
+    }
+
+    function toggleDarkMode() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('arou_wm_theme', isDark ? 'dark' : 'light');
+      document.getElementById('themeIcon').className = isDark ? 'fa-solid fa-sun text-amber-400' : 'fa-solid fa-moon text-lg';
+    }
+
+    function setFilter(filter) {
+      currentFilter = filter;
+      const filterBtns = {
+        all: 'btnFilterAll',
+        pending: 'btnFilterPending',
+        completed: 'btnFilterCompleted',
+        expense: 'btnFilterExpense'
+      };
+
+      Object.keys(filterBtns).forEach(f => {
+        const btn = document.getElementById(filterBtns[f]);
+        if (btn) {
+          if (f === filter) {
+            btn.className = 'px-3.5 py-1.5 rounded-xl border bg-blue-600 text-white border-blue-600 font-semibold whitespace-nowrap shadow-sm';
+          } else {
+            btn.className = 'px-3.5 py-1.5 rounded-xl border bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 whitespace-nowrap';
+          }
+        }
+      });
+
+      renderApp();
+    }
+
+    function setPeriod(period) {
+      currentPeriod = period;
+      ['Week', 'Month', 'All'].forEach(p => {
+        const btn = document.getElementById('btnPeriod' + p);
+        if (btn) {
+          if (p.toLowerCase() === period) {
+            btn.className = 'px-3 py-1.5 rounded-xl border bg-blue-600 text-white border-blue-600 font-bold';
+          } else {
+            btn.className = 'px-3 py-1.5 rounded-xl border bg-slate-100 dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300';
+          }
+        }
+      });
+      renderApp();
+    }
+
+    function isDateInPeriod(dateStr) {
+      if (currentPeriod === 'all') return true;
+      const d = new Date(dateStr);
+      const now = new Date();
+
+      if (currentPeriod === 'month') {
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      }
+
+      if (currentPeriod === 'week') {
+        const firstDayOfWeek = new Date(now);
+        const day = now.getDay() || 7;
+        firstDayOfWeek.setDate(now.getDate() - day + 1);
+        firstDayOfWeek.setHours(0,0,0,0);
+
+        const lastDayOfWeek = new Date(firstDayOfWeek);
+        lastDayOfWeek.setDate(firstDayOfWeek.getDate() + 6);
+        lastDayOfWeek.setHours(23,59,59,999);
+
+        return d >= firstDayOfWeek && d <= lastDayOfWeek;
+      }
+      return true;
+    }
+
+    function renderApp() {
+      renderStats();
+      renderCalendar();
+      renderList();
+    }
+
+    function renderStats() {
+      let paidTotal = 0, pendingTotal = 0, expenseTotal = 0;
+
+      jobs.forEach(item => {
+        if (isDateInPeriod(item.date)) {
+          if (item.type === 'expense') {
+            expenseTotal += Number(item.amount || 0);
+          } else {
+            const amt = Number(item.amount || 0);
+            const pd = Number(item.paid || 0);
+            paidTotal += pd;
+            if (amt > pd) pendingTotal += (amt - pd);
+          }
+        }
+      });
+
+      document.getElementById('statPaid').innerText = paidTotal.toFixed(2) + ' €';
+      document.getElementById('statPending').innerText = pendingTotal.toFixed(2) + ' €';
+      document.getElementById('statExpenses').innerText = expenseTotal.toFixed(2) + ' €';
+      document.getElementById('statProfit').innerText = (paidTotal - expenseTotal).toFixed(2) + ' €';
+    }
+
+    function renderCalendar() {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+
+      const monthNames = ['Ιανουάριος', 'Φεβρουάριος', 'Μάρτιος', 'Απρίλιος', 'Μάιος', 'Ιούνιος', 'Ιούλιος', 'Αύγουστος', 'Σεπτέμβριος', 'Οκτώβριος', 'Νοέμβριος', 'Δεκέμβριος'];
+      document.getElementById('calendarMonth').innerText = monthNames[month] + ' ' + year;
+
+      let startingDay = firstDay.getDay() - 1;
+      if (startingDay === -1) startingDay = 6;
+
+      const calendarDays = document.getElementById('calendarDays');
+      calendarDays.innerHTML = '';
+
+      for (let i = 0; i < startingDay; i++) {
+        calendarDays.innerHTML += '<div></div>';
+      }
+
+      for (let day = 1; day <= lastDay.getDate(); day++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const dayJobs = jobs.filter(j => j.date === dateStr);
+        const hasExpenses = dayJobs.some(j => j.type === 'expense');
+        const hasUnpaid = dayJobs.some(j => j.type !== 'expense' && Number(j.amount) > Number(j.paid));
+
+        let bg = 'hover:bg-slate-100 dark:hover:bg-slate-700';
+        if (selectedDate === dateStr) bg = 'bg-blue-600 text-white font-bold shadow-md';
+
+        calendarDays.innerHTML += `
+          <div onclick="selectCalendarDate('${dateStr}')" class="p-2 rounded-xl text-center cursor-pointer relative transition ${bg}">
+            ${day}
+            ${dayJobs.length > 0 ? `
+              <div class="flex justify-center gap-0.5 mt-1">
+                ${hasExpenses ? '<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>' : ''}
+                ${hasUnpaid ? '<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>' : ''}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }
+    }
+
+    function selectCalendarDate(dateStr) {
+      selectedDate = dateStr;
+      openModal(dateStr);
+    }
+
+    function prevMonth() { currentDate.setMonth(currentDate.getMonth() - 1); renderApp(); }
+    function nextMonth() { currentDate.setMonth(currentDate.getMonth() + 1); renderApp(); }
+
+    function renderList() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const container = document.getElementById('itemsContainer');
+      container.innerHTML = '';
+
+      let filtered = jobs.filter(j => {
+        if (!isDateInPeriod(j.date)) return false;
+
+        const expenseItemsText = (j.expenseItems || []).map(ei => (ei.title || '') + ' ' + (categoryLabels[ei.category] || '')).join(' ');
+
+        const matchesSearch = j.title.toLowerCase().includes(search) || 
+                              (j.notes && j.notes.toLowerCase().includes(search)) ||
+                              (j.location && j.location.toLowerCase().includes(search)) ||
+                              expenseItemsText.toLowerCase().includes(search);
+
+        if (!matchesSearch) return false;
+
+        if (currentFilter === 'pending') return j.type !== 'expense' && Number(j.amount) > Number(j.paid);
+        if (currentFilter === 'completed') return j.type !== 'expense' && Number(j.paid) >= Number(j.amount);
+        if (currentFilter === 'expense') return j.type === 'expense';
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="text-center py-10 text-slate-400 text-sm">Δεν βρέθηκαν καταχωρήσεις</div>';
+        return;
+      }
+
+      filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      filtered.forEach(item => {
+        const isExpense = item.type === 'expense';
+        const isUnpaid = !isExpense && Number(item.amount) > Number(item.paid);
+        const categoryBadge = isExpense ? (categoryLabels[item.expenseCategory] || '🟡 ΕΞΟΔΑ') : '🛠️ ΕΡΓΑΣΙΑ';
+
+        let expenseItemsHtml = '';
+        if (isExpense && item.expenseItems && item.expenseItems.length > 0) {
+          expenseItemsHtml = `
+            <div class="mt-2 space-y-1 border-t border-amber-200/50 dark:border-amber-800/50 pt-2">
+              <span class="text-[11px] font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider">Αναλυτικά Έξοδα:</span>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs">
+                ${item.expenseItems.map(ei => `
+                  <div class="flex items-center justify-between bg-amber-100/60 dark:bg-amber-900/40 px-2.5 py-1 rounded-lg">
+                    <span class="truncate pr-1 text-slate-700 dark:text-slate-200">${categoryLabels[ei.category] || '🟡'} ${ei.title ? `<b>${ei.title}</b>` : ''}</span>
+                    <span class="font-bold text-amber-700 dark:text-amber-300">${Number(ei.amount || 0).toFixed(2)} €</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        container.innerHTML += `
+          <div class="p-4 rounded-2xl bg-white dark:bg-slate-800 border ${isExpense ? 'border-amber-300 dark:border-amber-800 bg-amber-50/20' : 'border-slate-200 dark:border-slate-700'} shadow-sm space-y-2.5">
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="text-xs px-2 py-0.5 rounded-md font-semibold ${isExpense ? 'bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300' : 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300'}">
+                  ${categoryBadge}
+                </span>
+                <h3 class="font-bold text-base mt-1 text-slate-800 dark:text-slate-100">${item.title}</h3>
+                <p class="text-xs text-slate-400">${item.date}</p>
+              </div>
+              <div class="text-right">
+                <div class="font-bold text-lg ${isExpense ? 'text-amber-600 dark:text-amber-400' : 'text-slate-800 dark:text-slate-100'}">
+                  ${Number(item.amount).toFixed(2)} €
+                </div>
+                ${!isExpense ? `<div class="text-xs font-semibold ${isUnpaid ? 'text-rose-500' : 'text-emerald-500'}">${isUnpaid ? 'Οφειλή: ' + (item.amount - item.paid).toFixed(2) + ' €' : 'Εξοφλήθη'}</div>` : ''}
+              </div>
+            </div>
+
+            ${expenseItemsHtml}
+
+            ${item.location ? `
+              <div class="pt-1">
+                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.location)}" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-semibold hover:underline bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-lg">
+                  <i class="fa-solid fa-location-dot"></i> 📍 Google Maps: ${item.location}
+                </a>
+              </div>
+            ` : ''}
+
+            ${item.notes ? `<p class="text-xs text-slate-600 dark:text-slate-400 border-t border-slate-100 dark:border-slate-700/50 pt-2">${item.notes}</p>` : ''}
+
+            <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-700/50">
+              <button onclick="editJob('${item.id}')" class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition"><i class="fa-solid fa-pen"></i> Επεξεργασία</button>
+              <button onclick="deleteJob('${item.id}')" class="text-xs px-2.5 py-1 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-600 hover:bg-rose-100 transition"><i class="fa-solid fa-trash"></i> Διαγραφή</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function openModal(date = null) {
+      document.getElementById('jobForm').reset();
+      document.getElementById('editId').value = '';
+      document.getElementById('modalTitle').innerText = 'Νέα Καταχώρηση';
+      document.getElementById('date').value = date || new Date().toISOString().split('T')[0];
+      document.getElementById('expenseRowsContainer').innerHTML = '';
+      toggleExpenseFields();
+      document.getElementById('modal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.add('hidden');
+    }
+
+    function toggleExpenseFields() {
+      const type = document.getElementById('type').value;
+      const isExpense = type === 'expense';
+      document.getElementById('expenseCategoryGroup').style.display = isExpense ? 'block' : 'none';
+      document.getElementById('paidInputContainer').style.display = isExpense ? 'none' : 'block';
+
+      if (isExpense && document.querySelectorAll('.expense-row').length === 0) {
+        addExpenseRow();
+      }
+    }
+
+    function saveJob(e) {
+      e.preventDefault();
+      const id = document.getElementById('editId').value || Date.now().toString();
+      const type = document.getElementById('type').value;
+      const isExpense = type === 'expense';
+
+      let expenseItems = [];
+      if (isExpense) {
+        const rows = document.querySelectorAll('.expense-row');
+        rows.forEach(row => {
+          const cat = row.querySelector('.exp-cat').value;
+          const title = row.querySelector('.exp-title').value;
+          const amt = Number(row.querySelector('.exp-amount').value || 0);
+          if (amt > 0 || title) {
+            expenseItems.push({ category: cat, title, amount: amt });
+          }
+        });
+      }
+
+      const jobData = {
+        id,
+        type,
+        expenseCategory: isExpense && expenseItems.length > 0 ? expenseItems[0].category : null,
+        expenseItems: isExpense ? expenseItems : [],
+        date: document.getElementById('date').value,
+        title: document.getElementById('title').value,
+        location: document.getElementById('location').value,
+        amount: Number(document.getElementById('amount').value || 0),
+        paid: isExpense ? 0 : Number(document.getElementById('paid').value || 0),
+        notes: document.getElementById('notes').value
+      };
+
+      const idx = jobs.findIndex(j => j.id === id);
+      if (idx > -1) jobs[idx] = jobData;
+      else jobs.push(jobData);
+
+      localStorage.setItem('arou_wm_jobs', JSON.stringify(jobs));
+      closeModal();
+      renderApp();
+    }
+
+    function editJob(id) {
+      const item = jobs.find(j => j.id === id);
+      if (!item) return;
+
+      document.getElementById('editId').value = item.id;
+      document.getElementById('type').value = item.type || 'job';
+      
+      const isExpense = item.type === 'expense';
+      document.getElementById('expenseRowsContainer').innerHTML = '';
+
+      if (isExpense && item.expenseItems && item.expenseItems.length > 0) {
+        item.expenseItems.forEach(ei => addExpenseRow(ei.category, ei.title, ei.amount));
+      }
+
+      toggleExpenseFields();
+
+      document.getElementById('date').value = item.date;
+      document.getElementById('title').value = item.title;
+      document.getElementById('location').value = item.location || '';
+      document.getElementById('amount').value = item.amount;
+      document.getElementById('paid').value = item.paid;
+      document.getElementById('notes').value = item.notes || '';
+
+      document.getElementById('modalTitle').innerText = 'Επεξεργασία';
+      document.getElementById('modal').classList.remove('hidden');
+    }
+
+    function deleteJob(id) {
+      jobs = jobs.filter(j => j.id !== id);
+      localStorage.setItem('arou_wm_jobs', JSON.stringify(jobs));
+      renderApp();
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
