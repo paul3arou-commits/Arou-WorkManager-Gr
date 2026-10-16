@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Arou WorkManager GR</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script>tailwind.config={darkMode:'class'}</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{-webkit-tap-highlight-color:transparent}
+input,select,textarea{font-size:16px}
+.glass{background:rgba(255,255,255,.85);backdrop-filter:blur(12px)}
+.dark .glass{background:rgba(30,41,59,.85)}
+</style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen pb-24">
+
+<header class="sticky top-0 z-40 p-3" style="top:env(safe-area-inset-top,0px)">
+  <div class="max-w-5xl mx-auto glass rounded-2xl shadow-lg border border-slate-200/50 dark:border-slate-700/50 p-3 flex items-center justify-between gap-2">
+    <div class="flex items-center gap-2.5">
+      <div class="bg-blue-600 text-white w-10 h-10 flex items-center justify-center rounded-xl shadow-md text-lg">💼</div>
+      <div>
+        <h1 class="font-bold text-base leading-tight">Arou WorkManager GR</h1>
+        <p id="subtitle" class="text-[10px] text-slate-500 dark:text-slate-400">Τα δεδομένα μένουν στη συσκευή σου</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="openAccount()" id="acctBtn" class="p-2 rounded-xl bg-slate-200 dark:bg-slate-700" title="Λογαριασμός / Συγχρονισμός">👤</button>
+      <button onclick="openBackup()" class="p-2 rounded-xl bg-slate-200 dark:bg-slate-700" title="Χειροκίνητο αντίγραφο">💾</button>
+      <button onclick="toggleDark()" id="themeBtn" class="p-2 rounded-xl bg-slate-200 dark:bg-slate-700">🌙</button>
+      <button onclick="openModal('job')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-xl font-medium text-xs shadow-md">+ Νέα</button>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-5xl mx-auto px-3 space-y-4">
+
+  <div class="flex items-center justify-between bg-white dark:bg-slate-800 p-2 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 pl-2">📊 ΣΥΝΟΨΗ</span>
+    <div class="flex items-center gap-1 text-xs font-medium">
+      <button onclick="setPeriod('week')" id="btnPeriodweek"></button>
+      <button onclick="setPeriod('month')" id="btnPeriodmonth"></button>
+      <button onclick="setPeriod('all')" id="btnPeriodall"></button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <div onclick="openBreakdown('paid')" class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm cursor-pointer">
+      <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">🟢 ΕΙΣΠΡΑΧΘΗΚΑΝ</div>
+      <div id="statPaid" class="text-xl font-bold text-emerald-600 dark:text-emerald-400">0 €</div>
+    </div>
+    <div onclick="openBreakdown('unpaid')" class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm cursor-pointer">
+      <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">🔴 ΜΑΣ ΧΡΩΣΤΑΝΕ</div>
+      <div id="statPending" class="text-xl font-bold text-rose-600 dark:text-rose-400">0 €</div>
+    </div>
+    <div onclick="openBreakdown('expense')" class="bg-amber-50 dark:bg-amber-950/30 p-3.5 rounded-2xl border border-amber-300 dark:border-amber-800 shadow-sm cursor-pointer">
+      <div class="text-xs font-semibold text-amber-700 dark:text-amber-400 mb-1">🟡 ΕΞΟΔΑ</div>
+      <div id="statExpenses" class="text-xl font-bold text-amber-600 dark:text-amber-400">0 €</div>
+    </div>
+    <div onclick="openBreakdown('profit')" class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm cursor-pointer">
+      <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">💎 ΚΕΡΔΟΣ</div>
+      <div id="statProfit" class="text-xl font-bold text-blue-600 dark:text-blue-400">0 €</div>
+    </div>
+  </div>
+
+  <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+    <div class="flex items-center justify-between mb-2">
+      <h2 class="text-xs font-bold text-slate-500 dark:text-slate-400">📈 ΤΕΛΕΥΤΑΙΟΙ 6 ΜΗΝΕΣ</h2>
+      <div class="text-[10px] flex gap-3 text-slate-500 dark:text-slate-400"><span>🟩 Εισπράξεις</span><span>🟧 Έξοδα</span></div>
+    </div>
+    <div id="chart" class="flex items-end justify-between gap-2"></div>
+  </div>
+
+  <div class="space-y-2">
+    <div class="relative">
+      <input type="text" id="searchInput" oninput="renderList()" placeholder="🔍 Αναζήτηση: πελάτης, διεύθυνση, σημειώσεις, ποσό..." class="w-full pl-3 pr-9 py-2 text-sm rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <button id="searchClear" onclick="clearSearch()" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 px-1.5">✕</button>
+    </div>
+    <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs font-medium">
+      <button onclick="setFilter('all')" id="btnFilterall"></button>
+      <button onclick="setFilter('unpaid')" id="btnFilterunpaid"></button>
+      <button onclick="setFilter('expense')" id="btnFilterexpense"></button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <div class="lg:col-span-1 bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm self-start">
+      <div class="flex items-center justify-between mb-3">
+        <h2 id="calendarMonth" class="font-bold"></h2>
+        <div class="flex gap-1">
+          <button onclick="shiftMonth(-1)" class="px-2.5 py-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">‹</button>
+          <button onclick="shiftMonth(1)" class="px-2.5 py-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">›</button>
+        </div>
+      </div>
+      <div class="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-slate-400 mb-2">
+        <div>ΔΕ</div><div>ΤΡ</div><div>ΤΕ</div><div>ΠΕ</div><div>ΠΑ</div><div>ΣΑ</div><div>ΚΥ</div>
+      </div>
+      <div id="calendarDays" class="grid grid-cols-7 gap-1 text-xs"></div>
+      <p class="text-[10px] text-slate-400 mt-2">Πάτα μια μέρα για να δεις τις καταχωρήσεις της. Πάτα μια καταχώρηση για άμεση διόρθωση.</p>
+    </div>
+    <div class="lg:col-span-2 space-y-3">
+      <div id="dayBanner"></div>
+      <div id="itemsContainer" class="space-y-3"></div>
+    </div>
+  </div>
+</main>
+
+<nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-700 px-4 pt-2" style="padding-bottom:calc(env(safe-area-inset-bottom,0px) + .5rem)">
+  <div class="max-w-md mx-auto flex justify-between items-center text-xs font-medium text-slate-500 dark:text-slate-400">
+    <button onclick="window.scrollTo({top:0,behavior:'smooth'})" class="flex flex-col items-center gap-0.5 text-blue-600"><span class="text-lg">🏠</span>Αρχική</button>
+    <button onclick="openModal('job')" class="flex flex-col items-center gap-0.5"><span class="text-lg">🛠️</span>Εργασία</button>
+    <button onclick="openModal('expense')" class="flex flex-col items-center gap-0.5"><span class="text-lg">🧾</span>Έξοδο</button>
+    <button onclick="focusSearch()" class="flex flex-col items-center gap-0.5"><span class="text-lg">🔍</span>Αναζήτηση</button>
+    <button onclick="openAccount()" class="flex flex-col items-center gap-0.5"><span id="navAcctIcon" class="text-lg">👤</span>Λογαριασμός</button>
+  </div>
+</nav>
+
+<!-- Entry modal -->
+<div id="modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 items-center justify-center p-3">
+  <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
+    <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+      <h3 id="modalTitle" class="font-bold">Νέα Καταχώρηση</h3>
+      <button onclick="hide('modal')" class="text-slate-400 text-lg px-2">✕</button>
+    </div>
+    <form id="jobForm" onsubmit="saveJob(event)" class="p-4 space-y-3 text-sm overflow-y-auto">
+      <input type="hidden" id="editId">
+      <div>
+        <label class="block font-medium mb-1">Τύπος</label>
+        <select id="type" onchange="toggleFormMode()" class="w-full p-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700">
+          <option value="job">🛠️ Εργασία / Ραντεβού</option>
+          <option value="expense">🟡 Έξοδο</option>
+        </select>
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block font-medium mb-1">Ημερομηνία</label>
+          <input type="date" id="date" required class="w-full p-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700">
+        </div>
+        <div>
+          <label class="block font-medium mb-1" id="lblTitle">Πελάτης / Τίτλος</label>
+          <input type="text" id="title" required placeholder="π.χ. Γιώργος Παπαδόπουλος" class="w-full p-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700">
+        </div>
+      </div>
+      <div id="jobFields" class="space-y-3">
+        <div>
+          <label class="block font-medium mb-1">📍 Διεύθυνση (Google Maps)</label>
+          <input type="text" id="location" placeholder="π.χ. Τσιμισκή 45, Θεσσαλονίκη" class="w-full p-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-medium mb-1">Συνολικό Ποσό (€)</label>
+            <input type="number" step="0.01" id="amount" placeholder="0.00" class="w-full p-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700">
+          </div>
+          <div>
+            <label class="block font-medium mb-1">Πληρώθηκε (€)</label>
+            <input type="number" step="0.01" id="paid" placeholder="0.00" class="w-full p-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700">
+          </div>
+        </div>
+      </div>
+      <div id="expenseFields" class="hidden space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-2">
+          <span class="font-bold text-amber-600 dark:text-amber-400">Λίστα Εξόδων</span>
+          <button type="button" onclick="addSub()" class="text-xs bg-amber-500 text-white px-2.5 py-1 rounded-lg font-medium">+ Έξοδο</button>
+        </div>
+        <div id="subList" class="space-y-2"></div>
+        <div class="flex justify-between items-center p-2.5 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-200 dark:border-amber-800">
+          <span class="font-bold text-xs text-amber-800 dark:text-amber-300">ΣΥΝΟΛΟ:</span>
+          <span id="subTotal" class="font-bold text-base text-amber-600 dark:text-amber-400">0.00 €</span>
+        </div>
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Σημειώσεις</label>
+        <textarea id="notes" rows="2" placeholder="Σημειώσεις..." class="w-full p-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700"></textarea>
+      </div>
+      <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-200 dark:border-slate-700">
+        <button type="button" id="delBtn" onclick="delFromModal()" class="hidden px-3 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 font-medium">🗑️ Διαγραφή</button>
+        <div class="flex gap-2 ml-auto">
+          <button type="button" onclick="hide('modal')" class="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 font-medium">Ακύρωση</button>
+          <button type="submit" class="px-4 py-2 rounded-xl bg-blue-600 text-white font-medium shadow-md">Αποθήκευση</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Breakdown modal -->
+<div id="bdModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 items-center justify-center p-3">
+  <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 w-full max-w-lg max-h-[85vh] flex flex-col overflow-hidden">
+    <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+      <h3 id="bdTitle" class="font-bold"></h3>
+      <button onclick="hide('bdModal')" class="text-slate-400 text-lg px-2">✕</button>
+    </div>
+    <div id="bdContent" class="p-4 space-y-3 overflow-y-auto text-sm"></div>
+  </div>
+</div>
+
+<!-- Backup modal -->
+<div id="bkModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 items-center justify-center p-3">
+  <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
+    <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+      <h3 class="font-bold">💾 Αντίγραφο & Συγχρονισμός</h3>
+      <button onclick="hide('bkModal')" class="text-slate-400 text-lg px-2">✕</button>
+    </div>
+    <div class="p-4 space-y-3 overflow-y-auto text-sm">
+      <p class="text-xs text-slate-500 dark:text-slate-400">Για να περάσεις δεδομένα από το κινητό στο PC (ή ανάποδα): αντίγραψε τον κωδικό εδώ, στείλ’ τον στον εαυτό σου (Viber, email, σημειώσεις) και κάνε επικόλληση στην άλλη συσκευή στο πεδίο «Συγχώνευση».</p>
+      <div>
+        <div class="font-bold mb-1">1. Εξαγωγή (αυτή η συσκευή)</div>
+        <textarea id="bkOut" rows="4" readonly onclick="this.select()" class="w-full p-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-xs font-mono"></textarea>
+        <button onclick="copyBackup()" class="mt-1 px-3 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-medium">📋 Αντιγραφή κωδικού</button>
+      </div>
+      <div>
+        <div class="font-bold mb-1">2. Συγχώνευση (επικόλληση από άλλη συσκευή)</div>
+        <textarea id="bkIn" rows="4" placeholder="Επικόλλησε εδώ τον κωδικό..." class="w-full p-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-xs font-mono"></textarea>
+        <button onclick="mergeBackup()" class="mt-1 px-3 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-medium">🔀 Συγχώνευση</button>
+      </div>
+      <div id="bkMsg" class="text-xs font-semibold"></div>
+      <p class="text-[10px] text-slate-400">Η συγχώνευση προσθέτει ό,τι λείπει, κρατά τη νεότερη έκδοση κάθε καταχώρησης και μεταφέρει και τις διαγραφές. Με λογαριασμό (👤) τα κάνει όλα αυτά αυτόματα.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Account modal -->
+<div id="acModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 items-center justify-center p-3">
+  <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
+    <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+      <h3 class="font-bold">☁️ Λογαριασμός & Συγχρονισμός</h3>
+      <button onclick="hide('acModal')" class="text-slate-400 text-lg px-2">✕</button>
+    </div>
+    <div class="p-4 space-y-4 overflow-y-auto text-sm">
+
+      <div id="acSetup" class="hidden space-y-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+        <div class="font-bold text-amber-700 dark:text-amber-400">Πρώτη ρύθμιση (μία φορά ανά συσκευή)</div>
+        <p class="text-xs text-slate-600 dark:text-slate-300">Βάλε τα στοιχεία του Supabase project σου (Project Settings → API).</p>
+        <input type="text" id="cfgUrl" placeholder="Project URL (https://xxxx.supabase.co)" class="w-full p-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-xs">
+        <input type="text" id="cfgKey" placeholder="anon public key" class="w-full p-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-xs font-mono">
+        <button type="button" onclick="saveCfg()" class="px-3 py-1.5 rounded-xl bg-amber-500 text-white text-xs font-bold">Αποθήκευση ρυθμίσεων</button>
+      </div>
+
+      <form id="acOut" class="hidden space-y-2" onsubmit="doLogin(event)">
+        <p class="text-xs text-slate-500 dark:text-slate-400">Συνδέσου με το ίδιο email σε κάθε συσκευή και τα δεδομένα συγχρονίζονται αυτόματα. Ό,τι έχεις ήδη στη συσκευή δεν χάνεται, συγχωνεύεται.</p>
+        <input type="email" id="acEmail" autocomplete="email" placeholder="Email" class="w-full p-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700">
+        <input type="password" id="acPass" autocomplete="current-password" placeholder="Κωδικός (τουλάχιστον 6 χαρακτήρες)" class="w-full p-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700">
+        <div class="flex gap-2">
+          <button type="submit" class="flex-1 px-3 py-2 rounded-xl bg-blue-600 text-white font-medium shadow-md">Σύνδεση</button>
+          <button type="button" onclick="doSignUp()" class="flex-1 px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-600 font-medium">Νέος λογαριασμός</button>
+        </div>
+      </form>
+
+      <div id="acIn" class="hidden space-y-2">
+        <div class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800">
+          <div class="text-xs text-slate-500 dark:text-slate-400">Συνδεδεμένος ως</div>
+          <div id="acEmailShow" class="font-bold break-all"></div>
+          <div id="acSyncInfo" class="text-xs text-slate-500 dark:text-slate-400 mt-1"></div>
+        </div>
+        <div class="flex gap-2">
+          <button type="button" onclick="syncNow(true)" class="flex-1 px-3 py-2 rounded-xl bg-blue-600 text-white font-medium shadow-md">🔄 Συγχρονισμός τώρα</button>
+          <button type="button" onclick="doLogout()" class="px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-600 font-medium">Αποσύνδεση</button>
+        </div>
+        <p class="text-[10px] text-slate-400">Με την αποσύνδεση τα δεδομένα μένουν στη συσκευή, απλώς σταματά ο συγχρονισμός.</p>
+      </div>
+
+      <div id="acMessage" class="text-xs font-semibold"></div>
+      <button type="button" onclick="hide('acModal');openBackup()" class="text-xs text-slate-500 dark:text-slate-400 underline">💾 Χειροκίνητο αντίγραφο (copy / paste)</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const KEY='arou_wm_jobs', TKEY='arou_wm_theme', DKEY='arou_wm_tombs', CKEY='arou_wm_sbcfg', LKEY='arou_wm_lastsync';
+/* Αν θέλεις να μην πληκτρολογείς τα στοιχεία σε κάθε συσκευή, γράψε τα εδώ μέσα στα εισαγωγικά: */
+const SB_URL='', SB_KEY='';
+const CAT={fuel:'⛽ Βενζίνη',materials:'🧱 Υλικά / Εργαλεία',food:'🍕 Φαγητό',other:'🛠️ Άλλο'};
+const MONTHS=['Ιανουάριος','Φεβρουάριος','Μάρτιος','Απρίλιος','Μάιος','Ιούνιος','Ιούλιος','Αύγουστος','Σεπτέμβριος','Οκτώβριος','Νοέμβριος','Δεκέμβριος'];
+const MON=['Ιαν','Φεβ','Μαρ','Απρ','Μάι','Ιουν','Ιουλ','Αυγ','Σεπ','Οκτ','Νοε','Δεκ'];
+let mem=null;
+function load(){try{const a=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(a)?a:[]}catch(e){return mem||[]}}
+function loadTombs(){try{const a=JSON.parse(localStorage.getItem(DKEY)||'[]');return Array.isArray(a)?a:[]}catch(e){return []}}
+function persistLocal(){mem=jobs;try{localStorage.setItem(KEY,JSON.stringify(jobs));localStorage.setItem(DKEY,JSON.stringify(tombs))}catch(e){}}
+function persist(){persistLocal();scheduleSync()}
+let jobs=load(), tombs=loadTombs(), filter='all', period='month', selectedDate=null, viewDate=new Date();
+viewDate.setDate(1);
+
+const pad=n=>String(n).padStart(2,'0');
+const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const eur=n=>(Number(n)||0).toFixed(2)+' €';
+const num=v=>Number(v)||0;
+const owed=j=>j.type!=='expense'&&num(j.amount)>num(j.paid);
+const ld=s=>{const p=String(s).split('-').map(Number);return new Date(p[0],p[1]-1,p[2])};
+const show=id=>{const e=document.getElementById(id);e.classList.remove('hidden');e.classList.add('flex')};
+const hide=id=>{const e=document.getElementById(id);e.classList.add('hidden');e.classList.remove('flex')};
+
+function applyTheme(dark){
+  document.documentElement.classList.toggle('dark',dark);
+  document.getElementById('themeBtn').textContent=dark?'☀️':'🌙';
+}
+function toggleDark(){
+  const d=!document.documentElement.classList.contains('dark');
+  applyTheme(d);try{localStorage.setItem(TKEY,d?'dark':'light')}catch(e){}
+}
+function initTheme(){
+  let t=null;try{t=localStorage.getItem(TKEY)}catch(e){}
+  applyTheme(t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches);
+}
+
+function inPeriod(s){
+  if(selectedDate===null||true){
+    if(period==='all')return true;
+    const d=ld(s);
+    if(period==='month')return d.getMonth()===viewDate.getMonth()&&d.getFullYear()===viewDate.getFullYear();
+    const now=new Date(),start=new Date(now.getFullYear(),now.getMonth(),now.getDate()-((now.getDay()||7)-1));
+    const end=new Date(start.getFullYear(),start.getMonth(),start.getDate()+6,23,59,59);
+    return d>=start&&d<=end;
+  }
+}
+function setPeriod(p){
+  period=p;
+  const lbl={week:'🗓️ Εβδομάδα',month:'📅 '+MONTHS[viewDate.getMonth()].slice(0,5)+'.',all:'🌐 Όλα'};
+  ['week','month','all'].forEach(k=>{
+    const b=document.getElementById('btnPeriod'+k);
+    b.textContent=lbl[k];
+    b.className='px-2.5 py-1.5 rounded-xl border '+(k===p?'bg-blue-600 text-white border-blue-600 font-bold':'bg-slate-100 dark:bg-slate-700 border-slate-200 dark:border-slate-600');
+  });
+  renderApp();
+}
+function setFilter(f){filter=f;renderApp()}
+function renderFilters(){
+  const defs={all:'Όλα',unpaid:'🔴 Οφειλές',expense:'🟡 Έξοδα'};
+  Object.keys(defs).forEach(k=>{
+    const b=document.getElementById('btnFilter'+k);b.textContent=defs[k];
+    b.className='px-3 py-1.5 rounded-xl border whitespace-nowrap '+(k===filter?'bg-blue-600 text-white border-blue-600':'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700');
+  });
+}
+
+function renderApp(){
+  const lbl=MONTHS[viewDate.getMonth()].slice(0,5)+'.';
+  document.getElementById('btnPeriodmonth').textContent='📅 '+lbl;
+  renderFilters();renderStats();renderChart();renderCalendar();renderList();
+}
+
+function renderStats(){
+  let p=0,u=0,e=0;
+  jobs.forEach(j=>{if(!inPeriod(j.date))return;
+    if(j.type==='expense')e+=num(j.amount);else{p+=num(j.paid);if(owed(j))u+=num(j.amount)-num(j.paid)}});
+  statPaid.textContent=eur(p);statPending.textContent=eur(u);statExpenses.textContent=eur(e);statProfit.textContent=eur(p-e);
+}
+
+function renderChart(){
+  const y=viewDate.getFullYear(),m=viewDate.getMonth(),data=[];
+  for(let i=5;i>=0;i--){
+    const d=new Date(y,m-i,1),key=d.getFullYear()+'-'+pad(d.getMonth()+1);let inc=0,exp=0;
+    jobs.forEach(j=>{if(String(j.date).startsWith(key)){if(j.type==='expense')exp+=num(j.amount);else inc+=num(j.paid)}});
+    data.push({l:MON[d.getMonth()],inc,exp});
+  }
+  const max=Math.max(1,...data.map(d=>Math.max(d.inc,d.exp)));
+  const h=v=>v>0?Math.max(3,Math.round(v/max*80)):0;
+  document.getElementById('chart').innerHTML=data.map(d=>`
+    <div class="flex-1 flex flex-col items-center gap-1" title="${esc(d.l)}: ${eur(d.inc)} / ${eur(d.exp)}">
+      <div class="flex items-end gap-0.5 h-20">
+        <div class="w-3 sm:w-5 rounded-t bg-emerald-500" style="height:${h(d.inc)}px"></div>
+        <div class="w-3 sm:w-5 rounded-t bg-amber-500" style="height:${h(d.exp)}px"></div>
+      </div>
+      <div class="text-[10px] text-slate-500 dark:text-slate-400">${d.l}</div>
+    </div>`).join('');
+}
+
+function renderCalendar(){
+  const y=viewDate.getFullYear(),m=viewDate.getMonth(),last=new Date(y,m+1,0).getDate();
+  document.getElementById('calendarMonth').textContent=MONTHS[m]+' '+y;
+  let start=new Date(y,m,1).getDay()-1;if(start<0)start=6;
+  let h='<div></div>'.repeat(start);const today=todayStr();
+  for(let d=1;d<=last;d++){
+    const ds=y+'-'+pad(m+1)+'-'+pad(d),dj=jobs.filter(j=>j.date===ds);
+    const hasE=dj.some(j=>j.type==='expense'),hasU=dj.some(owed),hasJ=dj.some(j=>j.type!=='expense'&&!owed(j));
+    let cls=ds===selectedDate?'bg-blue-600 text-white font-bold':'hover:bg-slate-100 dark:hover:bg-slate-700';
+    if(ds===today&&ds!==selectedDate)cls+=' ring-1 ring-blue-500';
+    h+=`<div onclick="pickDay('${ds}')" class="p-2 rounded-xl text-center cursor-pointer ${cls}">${d}
+      <div class="flex justify-center gap-0.5 mt-1 h-1.5">
+        ${hasJ?'<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>':''}
+        ${hasE?'<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>':''}
+        ${hasU?'<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>':''}
+      </div></div>`;
+  }
+  document.getElementById('calendarDays').innerHTML=h;
+}
+function pickDay(ds){selectedDate=selectedDate===ds?null:ds;renderApp()}
+function shiftMonth(n){viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+n,1);selectedDate=null;renderApp()}
+
+const norm=s=>String(s==null?'':s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ς/g,'σ');
+function haystack(j){
+  const subs=(j.subItems||[]).map(x=>(x.desc||'')+' '+(CAT[x.category]||'')).join(' ');
+  return norm([j.title,j.notes,j.location,subs,j.amount,j.paid,j.date,ld(j.date).toLocaleDateString('el-GR')].join(' '));
+}
+function clearSearch(){const i=document.getElementById('searchInput');i.value='';renderList();i.focus()}
+function focusSearch(){const i=document.getElementById('searchInput');i.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>i.focus(),300)}
+
+function renderList(){
+  const raw=document.getElementById('searchInput').value;
+  const terms=norm(raw).split(/\s+/).filter(Boolean),searching=terms.length>0;
+  document.getElementById('searchClear').classList.toggle('hidden',!raw);
+  const box=document.getElementById('itemsContainer'),ban=document.getElementById('dayBanner');
+  const list=jobs.filter(j=>{
+    if(searching){const h=haystack(j);if(!terms.every(t=>h.includes(t)))return false}
+    else if(selectedDate?j.date!==selectedDate:!inPeriod(j.date))return false;
+    if(filter==='unpaid')return owed(j);
+    if(filter==='expense')return j.type==='expense';
+    return true;
+  }).sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:0);
+  if(searching){
+    ban.innerHTML=`<div class="flex items-center justify-between bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-2xl p-3 text-sm">
+      <span class="font-bold">🔍 ${list.length} αποτελέσματα σε όλες τις ημερομηνίες</span>
+      <button onclick="clearSearch()" class="px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-700 text-xs">✕ Καθαρισμός</button></div>`;
+  }else{
+    ban.innerHTML=selectedDate?`<div class="flex items-center justify-between bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-2xl p-3 text-sm">
+    <span class="font-bold">📅 ${esc(ld(selectedDate).toLocaleDateString('el-GR',{weekday:'long',day:'numeric',month:'long'}))}</span>
+    <span class="flex gap-2"><button onclick="openModal('job','${selectedDate}')" class="px-2.5 py-1 rounded-lg bg-blue-600 text-white text-xs font-medium">+ Προσθήκη</button>
+    <button onclick="pickDay('${selectedDate}')" class="px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-700 text-xs">✕ Όλες</button></span></div>`:'';
+  }
+  if(!list.length){box.innerHTML='<div class="text-center py-8 text-slate-400">'+(searching?'Δεν βρέθηκαν αποτελέσματα':'Δεν βρέθηκαν καταχωρήσεις')+'</div>';return}
+  box.innerHTML=list.map(j=>{
+    const ex=j.type==='expense',un=owed(j);
+    const subs=ex&&j.subItems&&j.subItems.length?`<div class="mt-2 pt-2 border-t border-amber-200 dark:border-amber-900/50 space-y-1">${j.subItems.map(s=>`
+      <div class="flex justify-between text-xs text-slate-600 dark:text-slate-300"><span>${esc(CAT[s.category]||'🟡 Έξοδο')}: <strong>${esc(s.desc)}</strong></span><span class="font-bold">${eur(s.amount)}</span></div>`).join('')}</div>`:'';
+    return `<div onclick="editJob('${j.id}')" class="cursor-pointer active:opacity-80 p-4 rounded-2xl border ${ex?'border-amber-300 dark:border-amber-800 bg-amber-50/40 dark:bg-slate-800':'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800'} shadow-sm space-y-2">
+      <div class="flex justify-between items-start gap-2">
+        <div class="min-w-0">
+          <span class="text-xs px-2 py-0.5 rounded-md font-semibold ${ex?'bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300':'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300'}">${ex?'🟡 ΕΞΟΔΑ':'🛠️ ΕΡΓΑΣΙΑ'}</span>
+          <h3 class="font-bold text-base mt-1 break-words">${esc(j.title)}</h3>
+          <p class="text-xs text-slate-400">${esc(ld(j.date).toLocaleDateString('el-GR'))}</p>
+        </div>
+        <div class="text-right shrink-0">
+          <div class="font-bold text-lg ${ex?'text-amber-600 dark:text-amber-400':''}">${eur(j.amount)}</div>
+          ${ex?'':`<div class="text-xs font-semibold ${un?'text-rose-500':'text-emerald-500'}">${un?'Οφειλή: '+eur(num(j.amount)-num(j.paid)):'Εξοφλήθη'}</div>`}
+        </div>
+      </div>
+      ${j.location?`<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(j.location)}" onclick="event.stopPropagation()" target="_blank" rel="noopener" class="inline-block text-xs text-emerald-600 dark:text-emerald-400 font-semibold bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-lg">📍 ${esc(j.location)}</a>`:''}
+      ${subs}
+      ${j.notes?`<p class="text-xs text-slate-600 dark:text-slate-400 border-t border-slate-100 dark:border-slate-700/50 pt-2 whitespace-pre-line">${esc(j.notes)}</p>`:''}
+      <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-700/50">
+        ${un?`<button onclick="event.stopPropagation();settle('${j.id}')" class="text-xs px-2.5 py-1 rounded-lg bg-emerald-600 text-white">✓ Εξόφληση</button>`:''}
+        <button onclick="event.stopPropagation();editJob('${j.id}')" class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-700">✏️ Επεξεργασία</button>
+        <button onclick="event.stopPropagation();deleteJob('${j.id}')" class="text-xs px-2.5 py-1 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-600">🗑️</button>
+      </div></div>`;
+  }).join('');
+}
+
+function settle(id){
+  const j=jobs.find(x=>x.id===id);if(!j)return;
+  j.paid=num(j.amount);j.updated=Date.now();persist();renderApp();
+  if(!document.getElementById('bdModal').classList.contains('hidden'))openBreakdown('unpaid');
+}
+
+/* ---------- Form ---------- */
+function openModal(type,date){
+  document.getElementById('jobForm').reset();
+  editId.value='';
+  modalTitle.textContent=type==='expense'?'Νέο Έξοδο':'Νέα Εργασία';
+  document.getElementById('type').value=type||'job';delBtn.classList.add('hidden');
+  document.getElementById('date').value=date||selectedDate||todayStr();
+  subList.innerHTML='';toggleFormMode();show('modal');
+}
+function toggleFormMode(){
+  const ex=document.getElementById('type').value==='expense';
+  jobFields.style.display=ex?'none':'block';
+  expenseFields.style.display=ex?'block':'none';
+  lblTitle.textContent=ex?'Τίτλος Εξόδων / Ημέρας':'Πελάτης / Τίτλος';
+  if(ex&&!subList.children.length)addSub();
+}
+function addSub(cat='fuel',desc='',amt=''){
+  const d=document.createElement('div');
+  d.className='sub-row grid grid-cols-12 gap-1.5 items-center bg-slate-50 dark:bg-slate-700/40 p-2 rounded-xl border border-slate-200 dark:border-slate-700';
+  d.innerHTML=`<div class="col-span-4"><select class="sub-cat w-full p-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800">
+    ${Object.keys(CAT).map(k=>`<option value="${k}" ${k===cat?'selected':''}>${CAT[k]}</option>`).join('')}</select></div>
+    <div class="col-span-4"><input type="text" class="sub-desc w-full p-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800" placeholder="Περιγραφή"></div>
+    <div class="col-span-3"><input type="number" step="0.01" class="sub-amt w-full p-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800" placeholder="€" oninput="calcSub()"></div>
+    <div class="col-span-1 text-center"><button type="button" class="text-rose-500" onclick="this.closest('.sub-row').remove();calcSub()">🗑️</button></div>`;
+  d.querySelector('.sub-desc').value=desc;d.querySelector('.sub-amt').value=amt;
+  subList.appendChild(d);calcSub();
+}
+function calcSub(){
+  let t=0;document.querySelectorAll('.sub-amt').forEach(i=>t+=num(i.value));
+  subTotal.textContent=eur(t);
+}
+function saveJob(e){
+  e.preventDefault();
+  const id=editId.value||Date.now().toString(),ex=document.getElementById('type').value==='expense';
+  let total=0;const subs=[];
+  if(ex){document.querySelectorAll('.sub-row').forEach(r=>{
+    const a=num(r.querySelector('.sub-amt').value);
+    if(a>0){subs.push({category:r.querySelector('.sub-cat').value,desc:r.querySelector('.sub-desc').value,amount:a});total+=a}})}
+  else total=num(document.getElementById('amount').value);
+  const data={id,type:ex?'expense':'job',date:document.getElementById('date').value,title:document.getElementById('title').value.trim(),
+    location:ex?'':document.getElementById('location').value.trim(),amount:total,paid:ex?0:num(document.getElementById('paid').value),
+    notes:document.getElementById('notes').value,subItems:ex?subs:[],updated:Date.now()};
+  const i=jobs.findIndex(j=>j.id===id);if(i>-1)jobs[i]=data;else jobs.push(data);
+  persist();hide('modal');renderApp();
+}
+function editJob(id){
+  const j=jobs.find(x=>x.id===id);if(!j)return;
+  document.getElementById('jobForm').reset();
+  editId.value=j.id;document.getElementById('type').value=j.type||'job';subList.innerHTML='';toggleFormMode();
+  document.getElementById('date').value=j.date;document.getElementById('title').value=j.title;
+  document.getElementById('location').value=j.location||'';
+  document.getElementById('amount').value=j.type==='expense'?'':j.amount;
+  document.getElementById('paid').value=j.type==='expense'?'':j.paid;
+  document.getElementById('notes').value=j.notes||'';
+  if(j.type==='expense'){subList.innerHTML='';(j.subItems||[]).forEach(s=>addSub(s.category,s.desc,s.amount));if(!subList.children.length)addSub()}
+  modalTitle.textContent='Επεξεργασία';delBtn.classList.remove('hidden');show('modal');
+}
+function deleteJob(id){
+  if(!confirm('Να διαγραφεί αυτή η καταχώρηση;'))return false;
+  jobs=jobs.filter(j=>j.id!==id);
+  tombs=tombs.filter(k=>k.id!==id);tombs.push({id,updated:Date.now()});
+  persist();renderApp();return true;
+}
+function delFromModal(){if(deleteJob(editId.value))hide('modal')}
+
+/* ---------- Breakdown ---------- */
+function editFromBd(id){hide('bdModal');editJob(id)}
+function openBreakdown(type){
+  const inP=jobs.filter(j=>inPeriod(j.date));let t='',h='';
+  const hint='<p class="text-[10px] text-slate-400">Πάτα μια γραμμή για άμεση διόρθωση.</p>';
+  const row=(a,b,cls,id)=>`<div ${id?`onclick="editFromBd('${id}')"`:''} class="flex justify-between items-center gap-2 p-2.5 rounded-xl border ${id?'cursor-pointer active:opacity-70':''} ${cls}">${a}${b}</div>`;
+  if(type==='paid'){
+    t='🟢 Εισπράξεις';
+    h=hint+inP.filter(j=>j.type!=='expense'&&num(j.paid)>0).map(j=>row(`<div class="min-w-0"><div class="font-bold break-words">${esc(j.title)}</div><div class="text-xs text-slate-400">${esc(j.date)}</div></div>`,`<div class="font-bold text-emerald-600 dark:text-emerald-400">+ ${eur(j.paid)}</div>`,'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800',j.id)).join('');
+    if(!inP.some(j=>j.type!=='expense'&&num(j.paid)>0))h='';
+  }else if(type==='unpaid'){
+    t='🔴 Οφειλές ανά πελάτη';
+    const g={};
+    inP.filter(owed).forEach(j=>{const k=j.title.trim().toLowerCase();(g[k]=g[k]||{name:j.title.trim(),sum:0,items:[]});g[k].sum+=num(j.amount)-num(j.paid);g[k].items.push(j)});
+    h=Object.values(g).sort((a,b)=>b.sum-a.sum).map(c=>`
+      <div class="rounded-xl border bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800 p-2.5 space-y-1.5">
+        <div class="flex justify-between font-bold"><span class="break-words">${esc(c.name)} <span class="text-xs font-normal text-slate-400">(${c.items.length})</span></span><span class="text-rose-600 dark:text-rose-400">${eur(c.sum)}</span></div>
+        ${c.items.map(j=>`<div onclick="editFromBd('${j.id}')" class="flex justify-between items-center text-xs text-slate-600 dark:text-slate-300 gap-2 cursor-pointer active:opacity-70 py-1"><span>✏️ ${esc(j.date)}</span><span class="flex items-center gap-2"><b>${eur(num(j.amount)-num(j.paid))}</b><button onclick="event.stopPropagation();settle('${j.id}')" class="px-2 py-0.5 rounded-lg bg-emerald-600 text-white">✓ Εξόφληση</button></span></div>`).join('')}
+      </div>`).join('');
+    if(h)h=hint+h;
+  }else if(type==='expense'){
+    t='🟡 Έξοδα ανά κατηγορία';
+    const c={fuel:0,food:0,materials:0,other:0},exps=inP.filter(j=>j.type==='expense').sort((a,b)=>a.date<b.date?1:-1);
+    exps.forEach(j=>{if(j.subItems&&j.subItems.length)j.subItems.forEach(s=>c[s.category]=(c[s.category]||0)+num(s.amount));else c.other+=num(j.amount)});
+    h=`<div class="flex justify-end"><button onclick="hide('bdModal');openModal('expense')" class="text-xs bg-amber-500 text-white px-3 py-1.5 rounded-xl font-bold">+ Νέο Έξοδο</button></div>`+
+      Object.keys(c).filter(k=>c[k]>0).map(k=>row(`<span class="font-bold">${CAT[k]}</span>`,`<span class="font-bold text-amber-600 dark:text-amber-400">${eur(c[k])}</span>`,'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800')).join('')+
+      (exps.length?`<div class="pt-2 text-xs font-bold text-slate-500 dark:text-slate-400">Αναλυτικά</div>`+hint+exps.map(j=>row(`<div class="min-w-0"><div class="font-bold break-words">${esc(j.title)}</div><div class="text-xs text-slate-400">${esc(j.date)}</div></div>`,`<div class="font-bold text-amber-600 dark:text-amber-400">${eur(j.amount)}</div>`,'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700',j.id)).join(''):'');
+  }else{
+    t='💎 Υπολογισμός Κέρδους';
+    let p=0,e=0;inP.forEach(j=>{if(j.type==='expense')e+=num(j.amount);else p+=num(j.paid)});
+    h=`<div class="space-y-2"><div class="flex justify-between"><span>Εισπράξεις</span><b class="text-emerald-500">+ ${eur(p)}</b></div>
+    <div class="flex justify-between"><span>Έξοδα</span><b class="text-amber-500">- ${eur(e)}</b></div>
+    <div class="flex justify-between pt-2 border-t border-slate-200 dark:border-slate-700 text-base font-bold"><span>Καθαρό Κέρδος</span><span class="text-blue-600 dark:text-blue-400">${eur(p-e)}</span></div></div>`;
+  }
+  bdTitle.textContent=t;
+  bdContent.innerHTML=h||'<div class="text-center text-slate-400 py-4">Δεν υπάρχουν δεδομένα</div>';
+  show('bdModal');
+}
+
+/* ---------- Merge (κοινό για backup και cloud) ---------- */
+function mergeIn(items){
+  let added=0,upd=0,del=0;
+  items.forEach(x=>{
+    if(!x||!x.id)return;
+    const xu=num(x.updated);
+    const i=jobs.findIndex(j=>j.id===x.id),t=tombs.findIndex(k=>k.id===x.id);
+    if(x.deleted){
+      if(i>-1){
+        if(xu>=num(jobs[i].updated)){jobs.splice(i,1);del++;if(t>-1)tombs[t].updated=Math.max(num(tombs[t].updated),xu);else tombs.push({id:x.id,updated:xu})}
+      }else if(t<0)tombs.push({id:x.id,updated:xu});
+      else if(xu>num(tombs[t].updated))tombs[t].updated=xu;
+      return;
+    }
+    if(!x.date||x.title===undefined)return;
+    if(t>-1){if(xu>num(tombs[t].updated))tombs.splice(t,1);else return}
+    if(i<0){jobs.push(x);added++}
+    else if(xu>num(jobs[i].updated)){jobs[i]=x;upd++}
+  });
+  return{added,upd,del};
+}
+
+/* ---------- Χειροκίνητο αντίγραφο ---------- */
+const exportCode=()=>JSON.stringify({app:'arou-wm',v:3,jobs,tombs});
+function openBackup(){bkOut.value=exportCode();bkIn.value='';bkMsg.textContent='';show('bkModal')}
+async function copyBackup(){
+  bkOut.select();
+  try{await navigator.clipboard.writeText(bkOut.value);bkMsg.className='text-xs font-semibold text-emerald-600';bkMsg.textContent='✓ Αντιγράφηκε!'}
+  catch(e){try{document.execCommand('copy');bkMsg.className='text-xs font-semibold text-emerald-600';bkMsg.textContent='✓ Αντιγράφηκε!'}catch(_){bkMsg.className='text-xs font-semibold text-amber-600';bkMsg.textContent='Επίλεξε το κείμενο και αντίγραψέ το χειροκίνητα.'}}
+}
+function mergeBackup(){
+  bkMsg.className='text-xs font-semibold text-rose-600';
+  let d;try{d=JSON.parse(bkIn.value.trim())}catch(e){bkMsg.textContent='Μη έγκυρος κωδικός.';return}
+  const live=Array.isArray(d)?d:(d&&d.jobs);
+  if(!Array.isArray(live)){bkMsg.textContent='Μη έγκυρος κωδικός.';return}
+  const dead=(d&&Array.isArray(d.tombs)?d.tombs:[]).map(k=>({id:k&&k.id,deleted:true,updated:k&&k.updated}));
+  const r=mergeIn(live.concat(dead));
+  persist();renderApp();bkOut.value=exportCode();
+  bkMsg.className='text-xs font-semibold text-emerald-600';
+  bkMsg.textContent=`✓ Νέες: ${r.added} · Ενημερώθηκαν: ${r.upd} · Διαγράφηκαν: ${r.del}`;
+}
+
+/* ---------- Λογαριασμός & cloud sync (Supabase) ---------- */
+let sb=null,user=null,syncing=false,pendingSync=false,syncErr=false,syncTimer=null;
+const cloudOn=()=>!!(sb&&user);
+function cfg(){let c={};try{c=JSON.parse(localStorage.getItem(CKEY)||'{}')}catch(e){}
+  return{url:(SB_URL||c.url||'').trim(),key:(SB_KEY||c.key||'').trim()}}
+function lastSync(){try{return Number(localStorage.getItem(LKEY))||0}catch(e){return 0}}
+const hhmm=ts=>new Date(ts).toLocaleTimeString('el-GR',{hour:'2-digit',minute:'2-digit'});
+function setAcMsg(t,kind){
+  const e=document.getElementById('acMessage');e.textContent=t||'';
+  e.className='text-xs font-semibold '+(kind==='ok'?'text-emerald-600':kind==='err'?'text-rose-600':'text-slate-500');
+}
+function trErr(m){
+  m=String(m||'');
+  if(/invalid login/i.test(m))return'Λάθος email ή κωδικός.';
+  if(/already registered/i.test(m))return'Υπάρχει ήδη λογαριασμός με αυτό το email. Πάτα Σύνδεση.';
+  if(/not confirmed/i.test(m))return'Επιβεβαίωσε πρώτα το email σου (δες τα εισερχόμενα).';
+  if(/at least 6|weak/i.test(m))return'Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες.';
+  if(/rate limit|too many/i.test(m))return'Πολλές προσπάθειες. Περίμενε λίγο και ξαναδοκίμασε.';
+  if(/fetch|network/i.test(m))return'Δεν υπάρχει σύνδεση στο ίντερνετ.';
+  return m||'Άγνωστο σφάλμα.';
+}
+function renderAcct(){
+  const hasCfg=!!(cfg().url&&cfg().key);
+  document.getElementById('acctBtn').textContent=user?'☁️':'👤';
+  document.getElementById('navAcctIcon').textContent=user?'☁️':'👤';
+  const sub=document.getElementById('subtitle');
+  if(!hasCfg||!window.supabase)sub.textContent='Τα δεδομένα μένουν στη συσκευή σου';
+  else if(!user)sub.textContent='Τοπικά δεδομένα · πάτα 👤 για σύνδεση';
+  else if(syncing)sub.textContent='☁️ Συγχρονισμός…';
+  else if(syncErr)sub.textContent='⚠️ Δεν συγχρονίστηκε · θα ξαναδοκιμάσει';
+  else sub.textContent='☁️ Συγχρονισμένο'+(lastSync()?' · '+hhmm(lastSync()):'');
+  document.getElementById('acSetup').classList.toggle('hidden',hasCfg);
+  document.getElementById('acOut').classList.toggle('hidden',!(hasCfg&&!user));
+  document.getElementById('acIn').classList.toggle('hidden',!user);
+  if(user){
+    acEmailShow.textContent=user.email||'';
+    acSyncInfo.textContent=syncing?'Συγχρονισμός…':syncErr?'⚠️ Το τελευταίο σφάλμα: θα ξαναδοκιμάσει αυτόματα.':(lastSync()?'Τελευταίος συγχρονισμός: '+hhmm(lastSync()):'');
+  }
+}
+function openAccount(){renderAcct();setAcMsg('');show('acModal')}
+function saveCfg(){
+  const url=cfgUrl.value.trim(),key=cfgKey.value.trim();
+  if(!/^https:\/\/.+/.test(url)||key.length<20){setAcMsg('Έλεγξε το URL και το κλειδί.','err');return}
+  try{localStorage.setItem(CKEY,JSON.stringify({url,key}))}catch(e){}
+  initCloud();setAcMsg('✓ Αποθηκεύτηκαν. Τώρα συνδέσου.','ok');
+}
+function initCloud(){
+  const c=cfg();
+  if(!c.url||!c.key||!window.supabase){renderAcct();return}
+  try{sb=window.supabase.createClient(c.url,c.key)}catch(e){sb=null;renderAcct();return}
+  sb.auth.getSession().then(({data})=>{user=data&&data.session?data.session.user:null;renderAcct();if(user)syncNow()}).catch(()=>renderAcct());
+  sb.auth.onAuthStateChange((ev,sess)=>{user=sess?sess.user:null;renderAcct()});
+  renderAcct();
+}
+async function doLogin(e){
+  if(e)e.preventDefault();
+  if(!sb){setAcMsg('Δεν έχει ρυθμιστεί η σύνδεση.','err');return}
+  const email=acEmail.value.trim(),pw=acPass.value;
+  if(!email||!pw){setAcMsg('Συμπλήρωσε email και κωδικό.','err');return}
+  setAcMsg('Σύνδεση…');
+  const{data,error}=await sb.auth.signInWithPassword({email,password:pw});
+  if(error){setAcMsg(trErr(error.message),'err');return}
+  user=data.user;acPass.value='';renderAcct();setAcMsg('✓ Συνδέθηκες','ok');
+  await syncNow(true);
+}
+async function doSignUp(){
+  if(!sb){setAcMsg('Δεν έχει ρυθμιστεί η σύνδεση.','err');return}
+  const email=acEmail.value.trim(),pw=acPass.value;
+  if(!email||pw.length<6){setAcMsg('Βάλε email και κωδικό (τουλάχιστον 6 χαρακτήρες).','err');return}
+  setAcMsg('Δημιουργία λογαριασμού…');
+  const{data,error}=await sb.auth.signUp({email,password:pw});
+  if(error){setAcMsg(trErr(error.message),'err');return}
+  if(data.session){user=data.user;acPass.value='';renderAcct();setAcMsg('✓ Ο λογαριασμός δημιουργήθηκε','ok');await syncNow(true)}
+  else setAcMsg('Στάλθηκε email επιβεβαίωσης. Πάτα τον σύνδεσμο και μετά κάνε Σύνδεση.','ok');
+}
+async function doLogout(){
+  if(!sb)return;
+  await sb.auth.signOut();user=null;syncErr=false;renderAcct();setAcMsg('Αποσυνδέθηκες. Τα δεδομένα έμειναν στη συσκευή.');
+}
+function scheduleSync(){if(!cloudOn())return;clearTimeout(syncTimer);syncTimer=setTimeout(()=>syncNow(),1200)}
+async function syncNow(manual){
+  if(!cloudOn())return;
+  if(syncing){pendingSync=true;return}
+  syncing=true;syncErr=false;renderAcct();
+  try{
+    const{data:rows,error}=await sb.from('jobs').select('id,data,updated,deleted');
+    if(error)throw error;
+    const items=rows.map(r=>r.deleted?{id:r.id,deleted:true,updated:Number(r.updated)}:Object.assign({},r.data||{},{id:r.id}));
+    const r=mergeIn(items);persistLocal();
+    const remote=new Map(rows.map(x=>[x.id,Number(x.updated)]));
+    const up=[];
+    jobs.forEach(j=>{if(!remote.has(j.id)||num(j.updated)>remote.get(j.id))up.push({user_id:user.id,id:j.id,data:j,updated:num(j.updated),deleted:false})});
+    tombs.forEach(k=>{if(!remote.has(k.id)||num(k.updated)>remote.get(k.id))up.push({user_id:user.id,id:k.id,data:null,updated:num(k.updated),deleted:true})});
+    for(let i=0;i<up.length;i+=300){
+      const{error:e2}=await sb.from('jobs').upsert(up.slice(i,i+300),{onConflict:'user_id,id'});
+      if(e2)throw e2;
+    }
+    try{localStorage.setItem(LKEY,String(Date.now()))}catch(e){}
+    if(r.added||r.upd||r.del)renderApp();
+    if(manual)setAcMsg(`✓ Συγχρονίστηκε · νέα από cloud: ${r.added+r.upd} · στάλθηκαν: ${up.length}`,'ok');
+  }catch(e){
+    syncErr=true;
+    if(manual)setAcMsg('Σφάλμα συγχρονισμού: '+trErr(e&&e.message),'err');
+    console.error(e);
+  }
+  syncing=false;renderAcct();
+  if(pendingSync){pendingSync=false;scheduleSync()}
+}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncNow()});
+window.addEventListener('online',()=>syncNow());
+setInterval(()=>{if(!document.hidden)syncNow()},45000);
+
+initTheme();setPeriod('month');initCloud();
+</script>
+</body>
+</html>
